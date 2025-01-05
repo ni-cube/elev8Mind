@@ -53,9 +53,11 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
   };
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // This needs to be set to the local emoji when the component mounts
+  // else localStorage will start giving issues in dashboard.tsx
   useEffect(() => {
     setEmoji(getCurrentEmoji().emoji);
-  });
+  }, [getCurrentEmoji]);
 
   const fetchVoice = async (text: string) => {
     try {
@@ -112,6 +114,7 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
             ...messages, //.filter((msg: Message) => msg.sender === "user"),
             userMessage,
           ],
+          "mood": getCurrentEmoji().mood,
         }),
       });
       // If the response is a stream, handle the stream (Real-time update)
@@ -124,13 +127,7 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
         done = readerDone;
         if (value != undefined && value.length > 0) {
           const decodedText = decoder.decode(value, { stream: !done });
-          //decodedText = decodedText.replace(/0:"|e:.*?}|d:.*?}|}|"/g, "");
-          //decodedText = decodedText.replace(/,isContinued:false/g, "");
-          //decodedText = decodedText.replace(/\s+([.,!?])/, "$1");
-          // Step 2: Replace multiple spaces with a single space and trim extra spaces
-          //decodedText = decodedText.replace(/\s+/g, " ");
-          //console.log(decodedText);
-          //
+
           chatText += decodedText.replace(/0:/g, "").replace(/\s+/g, " ").trim();
         }
       }  

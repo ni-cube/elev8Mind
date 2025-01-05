@@ -48,4 +48,4 @@ playwright/.cache
 Thumbs.db
 
 # Custom
-.env
+.env.local

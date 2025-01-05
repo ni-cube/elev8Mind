@@ -1,15 +1,5 @@
 // hooks/useEmotion.ts
-import { useState } from 'react';
-
 export const useEmotion = () => {
-  const [emotionData, setEmotionData] = useState({
-    joy: 0,
-    sadness: 0,
-    anxiety: 0,
-    anger: 0,
-    fatigue: 0,
-  });
-
 
   const emotionEmojis = {
     joy: {
@@ -55,14 +45,9 @@ export const useEmotion = () => {
     }));
   };
 
-  const printEmotionData = () => {
-    console.log(emotionData);
-  } 
   return {
     getCurrentEmoji, // Current emoji for the current mood
     setMood, // Function to set mood
     getAllEmotions, // Function to get all available emotions
-    setEmotionData,
-    printEmotionData,
   };
 };
