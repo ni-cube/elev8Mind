@@ -18,7 +18,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Footer */}
           <footer className="bg-[#72bbce] p-4 text-center text-white">
-            <p>VibeSpace &copy; 2026. All rights reserved.</p>
+            <p>Elev8 Mind &copy; 2026. All rights reserved.</p>
           </footer>
         </div>
   );

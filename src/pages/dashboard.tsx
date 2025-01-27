@@ -1,95 +1,88 @@
-"use client"
-import ChatHeader from "@/components/chat-header";
-import ChatPrompt from "@/components/chat-prompt";
+import ChatHeader from "@/components/header";
+import ChatPrompt from "@/components/prompt";
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import clsx from 'clsx';
-import { useEmotion } from "@/hooks/useEmotion";
 import Layout from "@/layout";
-
+import { Profile } from "@/types/profile";
+import { emotionEmojis } from "@/utils/emotions";
 interface Message {
-  id: number;
-  text: string;
-  sender: string;
-  timestamp: string;
+    id: number;
+    text: string;
+    sender: string;
+    timestamp: string;
 }
+
 export default function Dashboard() {
-  const [messages, setMessages] = useState<Message[]>([]); // Adjust the type as needed
+    const [messages, setMessages] = useState<Message[]>([]); // Adjust the type as needed
+    const [profile, setProfile] = useState<Profile>({} as Profile);
+    // Memoize the setMessages function using useCallback, passing it directly to the child component
+    const memoizedSetMessages = useCallback<React.Dispatch<React.SetStateAction<Message[]>>>(
+        (newMessages) => {
+            setMessages(newMessages); // This is the only place where setMessages is used
+        },
+        [] // Empty dependency array means the function is memoized and stable across re-renders
+    );
 
-  const { getCurrentEmoji } = useEmotion();
-  
-  useEffect(() => {
-    setMessages([
-      {
-        id: 1,
-        text: `Hi ${localStorage.getItem('username')}! I'm VibeSpace 💙. How are you feeling today?`,
-        sender: "bot",
-        timestamp: new Date().toISOString(),
-      },
-    ]);  
-  }, []);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const container = messagesContainerRef.current;
+        if (!container) return;
+        container.scrollTop = container.scrollHeight; // Scroll to bottom
+    }, [messages]);
 
-  
-  // Memoize the setMessages function using useCallback, passing it directly to the child component
-  const memoizedSetMessages = useCallback<React.Dispatch<React.SetStateAction<Message[]>>>(
-    (newMessages) => {
-      setMessages(newMessages); // This is the only place where setMessages is used
-    },
-    [] // Empty dependency array means the function is memoized and stable across re-renders
-  );
+    useEffect(() => {
+        setProfile(JSON.parse(localStorage.getItem('profile') || '{}'));
+    }, [profile]);
 
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (!container) return;
-    container.scrollTop = container.scrollHeight; // Scroll to bottom
-  }, [messages]);
-
-  
-  useEffect(() => {
-    setMessages(() => [
-      {
-        id: 1,
-        text: `Hi ${localStorage.getItem('username')}! ${getCurrentEmoji().response}`,
-        sender: "bot",
-        timestamp: new Date().toISOString(),
-      },
-    ]);
-  }, []);
-
+    useEffect(() => {
+        const profile = JSON.parse(localStorage.getItem('profile') || '{}'); 
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: prev.length + 1,
+                text: `Hi ${profile.username}! ${emotionEmojis[profile.emotKey as keyof typeof emotionEmojis].response}`,
+                sender: "bot",
+                timestamp: new Date().toISOString(),
+            },
+        ]);
+    }, []);
     return (
-      
+
       <Layout>
         <div className="flex flex-col h-screen bg-primary p-2">
-            <div className="max-w-4xl mx-auto w-full flex flex-col flex-1">
-            <ChatHeader stars={0} level={0} />
+            <div className="max-w-7xl mx-auto w-full flex flex-col flex-1" style={{ height: '100%' }}>
+            <ChatHeader stars={0} level={0} profile={profile} messages={messages}/>
         
-            <div className="flex-1 bg-lightest rounded-lg p-5 overflow-y-auto mb-5 shadow-md"
+            <div className="flex-1 bg-lightest rounded-lg p-5 overflow-y-auto mb-5"
                 style={{ maxHeight: '100%' }}
                 ref={messagesContainerRef}>
-                {messages.map((message) => (
-                <div
-                    key={message.id}
-                    className={clsx(
-                    'flex mb-2',
-                    message.sender === 'user' ? 'justify-end' : 'justify-start'
-                    )}
-                >
+                <div className="w-full max-w-100% mx-auto">
+                    {messages.map((message) => (
                     <div
+                        key={message.id}
                         className={clsx(
-                            'max-w-[70%] p-3 rounded-lg shadow-lg',
-                            message.sender === 'user' ? 'bg-darkest text-white' : 'bg-lighter text-text'
+                        'flex mb-2',
+                        message.sender === 'user' ? 'justify-end' : 'justify-start'
                         )}
                     >
-                        {message.text}
+                        <div
+                            className={clsx(
+                                'max-w-[70%] p-3 rounded-lg shadow-lg',
+                                message.sender === 'user' ? 'bg-darkest text-white' : 'bg-lighter text-text'
+                            )}
+                        >
+                            {message.text.split('/n').map((line, idx) => (
+                                <p key={idx} className="m-0 mb-1">{line}</p>
+                                ))}
+                        </div>
                     </div>
-                </div>
-                ))}
+                    ))}
+                </div>    
             </div>
         
-            <ChatPrompt messages={messages} setMessages={memoizedSetMessages} />
+            <ChatPrompt messages={messages} setMessages={memoizedSetMessages}/>
             </div>
         </div>
       </Layout>
-       
     );    
 }

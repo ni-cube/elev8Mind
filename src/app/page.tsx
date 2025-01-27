@@ -1,8 +1,8 @@
 "use client"
-import Dashboard from "@/pages/dashboard";
+
 
 export default function Home() {
     return (
-        <Dashboard />
-    );
+        <p>Elev8 Mind Home Page</p>
+    ); 
 }

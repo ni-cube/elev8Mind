@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@radix-ui/themes";
 import Layout from "@/layout";
 import clsx from "clsx";
-import ChatHeader from "@/components/chat-header";
+import ChatHeader from "@/components/header";
 
 // Define the state type for gameState
 interface GameState {
@@ -397,9 +397,11 @@ const questions = [
 
 // Define the state type for messages
 interface Message {
-  type: "bot" | "user";
-  content: string;
+  sender: "bot" | "user";
+  text: string;
   options?: string[];
+  id: number;
+  timestamp: string;
 }
 
 export default function Explorer() {
@@ -413,9 +415,11 @@ export default function Explorer() {
   useEffect(() => {
     setMessages([
       {
-        type: "bot",
-        content: "Hey! 👋 Ready to explore your emotional world? You'll earn stars and unlock cool insights!",
+        id: 1,
+        sender: "bot",
+        text: "Hey! 👋 Ready to explore your emotional world? You'll earn stars and unlock cool insights!",
         options: ["Start Quest", "How does it work?"],
+        timestamp: new Date().toISOString(),
       },
     ]);  
   }, []);
@@ -426,10 +430,10 @@ export default function Explorer() {
   };
 
   const showCrisisResources = () => {
-    console.log("Showing crisis resources");
     addMessage({
-      type: "bot",
-      content: `🆘 Important Support Resources:/n/n
+      id: messages.length + 1,
+      sender: "bot",
+      text: `🆘 Important Support Resources:/n/n
       
       • Crisis Helpline: Available 24/7 - Call or Text 988/n
       • Teen Crisis Text Line: Text HOME to 741741/n
@@ -438,18 +442,24 @@ export default function Explorer() {
       Remember: You're not alone. Reaching out is a sign of strength! 💪/n
       Would you like to:`,
       options: ["Talk to Someone Now", "Continue Quest", "Take a Break"],
+      timestamp: new Date().toISOString(),
     });
   };
 
   const handleUserChoice = (choice: string) => {
-    console.log("Choice selected:", choice);
-    addMessage({ type: "user", content: choice });
+    addMessage({ 
+      id: messages.length + 1,
+      timestamp: new Date().toISOString(),
+      sender: "user", 
+      text: choice });
 
     if (choice === "Start Quest") {
       setTimeout(() => {
         addMessage({
-          type: "bot",
-          content:
+          id: messages.length + 1,
+          timestamp: new Date().toISOString(),
+          sender: "bot",
+          text:
             "Awesome! Every honest answer earns stars and unlocks achievements. Ready?",
           options: ["Begin Adventure"],
         });
@@ -469,10 +479,11 @@ export default function Explorer() {
         console.log("Adding first question...");
         if (questions && questions.length > 0) {
           const firstQuestion = questions[0];
-          console.log("First question:", firstQuestion);
           addMessage({
-            type: "bot",
-            content: firstQuestion.text,
+            id: messages.length + 1,
+            timestamp: new Date().toISOString(),
+            sender: "bot",
+            text: firstQuestion.text,
             options: firstQuestion.options.map((opt) => opt.text),
           });
         } else {
@@ -481,8 +492,10 @@ export default function Explorer() {
       }, 100);
     } else if (choice === "Take a Break") {
       addMessage({
-        type: "bot",
-        content:
+        id: messages.length + 1,
+        timestamp: new Date().toISOString(),
+        sender: "bot",
+        text:
           "Thank you for sharing your feelings today! Taking care of your emotional well-being is important. Come back anytime - we're here to support you! 💫",
         options: ["Start New Quest", "Get Support Resources"],
       });
@@ -493,8 +506,10 @@ export default function Explorer() {
       showCrisisResources();
     } else if (choice === "How does it work?") {
       addMessage({
-        type: "bot",
-        content:
+        id: messages.length + 1,
+        timestamp: new Date().toISOString(),
+        sender: "bot",
+        text:
           "Here's how the Mood Explorer works:\n\n• Answer questions about your feelings\n• Earn stars for honest responses\n• Get insights about your emotional state\n• Track your progress across levels\n• Access support resources when needed\n\nReady to begin?",
         options: ["Start Quest", "Get Support Resources"],
       });
@@ -526,8 +541,10 @@ export default function Explorer() {
         const nextQuestion = questions[nextIndex];
         if (nextQuestion) {
           addMessage({
-            type: "bot",
-            content: nextQuestion.text,
+            id: messages.length + 1,
+            timestamp: new Date().toISOString(),
+            sender: "bot",
+            text: nextQuestion.text,
             options: nextQuestion.options.map((opt) => opt.text),
           });
         }
@@ -556,8 +573,10 @@ export default function Explorer() {
     const bdiScore = gameState.bdiScore ?? 0;
 
     addMessage({
-      type: "bot",
-      content: `🎉 Quest Complete! /n/n
+      id: messages.length + 1,
+      timestamp: new Date().toISOString(),
+      sender: "bot",
+      text: `🎉 Quest Complete! /n/n
         Your Journey Stats:/n
          Total ⭐: ${totalStars}/n
          Score 🏆: ${bdiScore}/n/n/n
@@ -588,8 +607,8 @@ export default function Explorer() {
   return (
     <Layout>
       <div className="flex flex-col h-screen bg-primary p-2">
-        <div className="max-w-4xl mx-auto w-full flex flex-col flex-1" style={{ height: '100%' }}>
-          <ChatHeader stars={gameState.stars} level={gameState.level} />
+        <div className="max-w-7xl mx-auto w-full flex flex-col flex-1" style={{ height: '100%' }}>
+          <ChatHeader stars={gameState.stars} level={gameState.level} profile={JSON.parse('{}')} messages={messages}/>
           
           <div
             className="flex-1 bg-lightest rounded-lg p-5 overflow-y-auto mb-5"
@@ -601,16 +620,16 @@ export default function Explorer() {
                   key={index}
                   className={clsx(
                     'flex mb-1',
-                    message.type === 'user' ? 'justify-end' : 'justify-start'
+                    message.sender === 'user' ? 'justify-end' : 'justify-start'
                   )}
                 >
                   <div
                     className={clsx(
                       'max-w-[65%] rounded-lg shadow-lg',
-                      message.type === 'user' ? 'p-2 bg-darkest text-white' : 'p-3 bg-lighter text-text'
+                      message.sender === 'user' ? 'p-2 bg-darkest text-white' : 'p-3 bg-lighter text-text'
                     )}
                   >
-                    {message.content.split('/n').map((line, idx) => (
+                    {message.text.split('/n').map((line, idx) => (
                       <p key={idx} className="m-0 mb-1">{line}</p>
                     ))}
                     {message.options && (

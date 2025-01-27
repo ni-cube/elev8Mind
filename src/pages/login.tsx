@@ -1,8 +1,9 @@
 // src/pages/login.tsx
 import Layout from "@/layout";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useRouter } from 'next/navigation'; // Use Next.js router
 import { useEmotion } from "@/hooks/useEmotion";
+import { Profile } from "@/types/profile";
 
 
 const Login: React.FC = () => {
@@ -10,11 +11,23 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const { getAllEmotions,setMood } = useEmotion();
+  const [gender, setGender] = useState<string>(""); // State for gender dropdown
+  const [grade, setGrade] = useState<string>(""); // State for grade dropdown
+  const { getAllEmotions } = useEmotion();
   const [password, setPassword] = useState<string>(""); // For password
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]); // State for multiple emoji selections
   
   const router = useRouter(); // To navigate to another page after login
+
+  useEffect(() => {
+    const profile: Profile = {
+      username: isAnonymous ? 'Anonymous' : username, 
+      gender, 
+      grade, 
+      emotKey: selectedEmotions[0]
+    };
+    localStorage.setItem('profile', JSON.stringify(profile));
+  }, [username, isAnonymous, gender, grade, selectedEmotions]);
 
   // Handle the form submission
   const handleSubmit = (e: FormEvent) => {
@@ -28,23 +41,17 @@ const Login: React.FC = () => {
     } else {
       setErrorMessage("");
 
-      // Store username in localStorage or sessionStorage if necessary
-      localStorage.setItem('username', isAnonymous ? 'Anonymous' : username);
-
-      console.log(localStorage.getItem('username'));
-
       if(username === "Nirajeet" && password === "password") {
         router.push('/admin');
       } else {
         // Redirect to the dashboard page
-        router.push('/'); // Navigate to the dashboard route
+        router.push('/dashboard'); // Navigate to the dashboard route
       }
     }
   };
 
-  const handleClick = (e: FormEvent, emoji: "joy" | "sadness" | "anxiety" | "anger" | "fatigue") => {
+  const handleClick = (e: FormEvent, emoji: "joy" | "sadness" | "anxiety" | "anger" | "sleepy" | "upset") => {
     e.preventDefault();
-    setMood(emoji);
     // Toggle emoji in the selectedEmotions array
     setSelectedEmotions((prevSelectedEmotions) => {
       if (prevSelectedEmotions.includes(emoji)) {
@@ -60,9 +67,9 @@ const Login: React.FC = () => {
   return (
   <Layout>
     <div className="flex justify-center items-center min-h-screen bg-[#72bbce] p-4">
-      <div className="bg-white p-4 rounded-xl shadow-lg w-full max-w-sm">
+      <div className="bg-white p-4 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-[#407786] text-2xl font-semibold text-center mb-6">
-          VibeSpace 💙
+          Elev8 Mind 💙
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -100,7 +107,44 @@ const Login: React.FC = () => {
             </div>
           </div>
         )}
+        {username != "Nirajeet" && (
+          <>
+            <div className="mb-4">
+              <label htmlFor="gender" className="block text-[#2c5561] text-sm mb-2">
+                Gender
+              </label>
+              <select
+                id="gender"
+                value={gender}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setGender(e.target.value)}
+                className="w-full p-3 border rounded-lg bg-[#e8f4f7] text-text focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
+            <div className="mb-4">
+              <label htmlFor="grade" className="block text-text text-sm mb-2">
+                Grade
+              </label>
+              <select
+                id="grade"
+                value={grade}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setGrade(e.target.value)}
+                className="w-full p-3 border rounded-lg bg-[#e8f4f7] text-[#2c4441] focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
+              >
+                <option value="">Select Grade</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+              </select>
+            </div>
+          </>
+        )}
         {/* Anonymous checkbox below the username and password */}
         <div className="flex items-center mb-6">
           <input
@@ -118,7 +162,7 @@ const Login: React.FC = () => {
           {getAllEmotions().map((emotion, emoji) => (
             <button
               key={emoji}
-              onClick={(e) => handleClick(e, emotion.emotion as "joy" | "sadness" | "anxiety" | "anger" | "fatigue")}
+              onClick={(e) => handleClick(e, emotion.emotion as "joy" | "sadness" | "anxiety" | "anger" | "sleepy" | "upset")}
               className={`flex flex-col items-center p-2 border-none rounded-lg cursor-pointer
                     ${selectedEmotions.includes(emotion.emotion) ? 'bg-[#4db8ff] border-2 border-[#1d8fbc]' : 'bg-lighter'}
                     hover:bg-[#ffde59] focus:ring-2 focus:ring-[#5999ab]`}

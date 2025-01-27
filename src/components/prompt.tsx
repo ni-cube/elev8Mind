@@ -1,51 +1,53 @@
-"use client"
 import React, { useState, useRef, useEffect } from "react";
-import { useEmotion } from "@/hooks/useEmotion";
-const commonEmojis = [
-  "😊",
-  "😃",
-  "😄",
-  "🙂",
-  "😁",
-  "😢",
-  "😭",
-  "😥",
-  "☹️",
-  "😔",
-  "😰",
-  "😨",
-  "😱",
-  "😟",
-  "😦",
-  "😠",
-  "😡",
-  "💢",
-  "😤",
-  "😣",
-  "😫",
-  "😪",
-  "🥱",
-  "😮‍💨",
-  "🌟",
-  "❤️",
-  "💕",
-  "✨",
-  "👍",
-  "🙏",
-];
+import { getCategoryOf2ndLastSymptomsCovered, getSymptomfromEmotionId, getKeywords } from "@/lib/cema";
+import { helpMessage } from "../utils/genericMessage";
+import { readChatResponse } from "@/utils/util";
+import { Profile } from "@/types/profile";
+import { emotionEmojis, commonEmojis } from "@/utils/emotions";
+
 interface Message {
   id: number;
   text: string;
   sender: string;
   timestamp: string;
 }
+interface ChatState {
+  symptomsCovered: string[],
+  currentSymptomId: string,
+  currentSeverity: number,
+}
+interface SymptomSelection {
+  symptomCovered:string, 
+  keywords: string[],
+}
 export default function ChatPrompt({ messages, setMessages }: { messages: Message[], setMessages: React.Dispatch<React.SetStateAction<Message[]>> }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [ emoji, setEmoji ] = useState("");
-  const [isMute, setIsMute] = useState(false);
+  const [profile, setProfile] = useState<Profile>({} as Profile);
+  const [isMute, setIsMute] = useState(true);
   const [inputText, setInputText] = useState("");
   const [generatingText, setGeneratingText] = useState<boolean>(false);
-  const { getCurrentEmoji } = useEmotion();
+
+  useEffect(() => {
+    const profile = JSON.parse(localStorage.getItem('profile') || '{}');
+    setProfile(profile);
+    const symptomId = getSymptomfromEmotionId(profile.emotKey).id;
+    setChatState({
+      symptomsCovered: [symptomId + "_L"],
+      currentSymptomId: symptomId,
+      currentSeverity: 0,
+    });
+    setEmoji(emotionEmojis[profile.emotKey as keyof typeof emotionEmojis].emoji);
+  }, []);
+
+  const [chatState, setChatState] = useState<ChatState>({
+    symptomsCovered: ["Angry" + "_L"],
+    currentSymptomId: "Angry",
+    currentSeverity: 0,
+  });
+  //const [symptomsCovered, setSymptomsCovered] = useState<string[]>([]);
+
+
 
   const handleEmojiClick = (emoji: string) => {
     setInputText((prev) => prev + emoji);
@@ -53,11 +55,7 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
   };
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // This needs to be set to the local emoji when the component mounts
-  // else localStorage will start giving issues in dashboard.tsx
-  useEffect(() => {
-    setEmoji(getCurrentEmoji().emoji);
-  }, [getCurrentEmoji]);
+  const severity = 2;
 
   const fetchVoice = async (text: string) => {
     try {
@@ -103,6 +101,11 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
     
     try {
       setGeneratingText(true);
+
+      console.log("Ni3 Input - " + JSON.stringify(chatState));
+      const symptomSelected:SymptomSelection = getKeywords(chatState.currentSymptomId, chatState.currentSeverity, chatState.symptomsCovered);
+      console.log("Ni3 Output - " + JSON.stringify(symptomSelected));  
+      console.log("User Input - " + inputText);  
       // Send the message to the backend API using Fetch (for streaming)
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -114,32 +117,30 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
             ...messages, //.filter((msg: Message) => msg.sender === "user"),
             userMessage,
           ],
-          "mood": getCurrentEmoji().mood,
+          "keywords": (symptomSelected!=null)?symptomSelected.keywords: [],
+          "old_keywords": getCategoryOf2ndLastSymptomsCovered(chatState.symptomsCovered),
+          "profile": profile,
         }),
       });
       // If the response is a stream, handle the stream (Real-time update)
       const reader = response.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let done = false;
-      let chatText = "";
-      while (!done ) {
-        const { value, done: readerDone } = await reader!.read();
-        done = readerDone;
-        if (value != undefined && value.length > 0) {
-          const decodedText = decoder.decode(value, { stream: !done });
-
-          chatText += decodedText.replace(/0:/g, "").replace(/\s+/g, " ").trim();
-        }
-      }  
+      let chatText = await readChatResponse(reader);  
   
       (async () => {
-        // Step 1: Remove "0:" and similar prefixes, along with unwanted metadata
-        const cleanedString = chatText.replace(/0:"|e:.*?}|d:.*?}|}|"/g, "");
-        chatText = cleanedString.replace(/,isContinued:false/g, "");
-        chatText = chatText.replace(/\s+([.,!?])/, "$1");
-        chatText = chatText.replace(/\s+/g, " ").trim();
+        if(chatText.startsWith("Help is available.")) {
+          chatText = helpMessage;
+        } else if(chatText.indexOf("Thank you. I'm here to help whenever you need me.")!=-1) {
+          chatText = "Thank you. I'm here to help whenever you need me. 💙";
+        }
+        if(symptomSelected!=null) {
+          setChatState(prev => ({
+            ...prev,
+            symptomsCovered: [...prev.symptomsCovered, symptomSelected.symptomCovered],
+            currentSymptomId: symptomSelected.symptomCovered.replace("_H", "").replace("_L", ""),
+            currentSeverity: severity,
+          }));
+        }
 
-        chatText = chatText.replace(/\n/g, "<br/>");
         const botResponse = {
           id: messages.length + 1,
           text: chatText,

@@ -1,10 +1,11 @@
-'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
 import { CategoryScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, LinearScale } from 'chart.js';
 import Chart from 'chart.js/auto';
 import Layout from '@/layout';
-
+import { userSessions } from '@/data/store';
+import ChatHeader from '@/components/header';
+import { readChatResponse } from '@/utils/util';
 
 // Register chart.js components
 Chart.register(
@@ -19,139 +20,234 @@ Chart.register(
 );
 
 const AnalyticsPage = () => {
-  // Dummy data representing PHQ-9 scores of kids
-  const [phqData] = useState([
-    { id: 1, name: 'Kid 1', score: 1 },
-    { id: 2, name: 'Kid 2', score: 1 },
-    { id: 3, name: 'Kid 3', score: 4 },
-    { id: 4, name: 'Kid 4', score: 2 },
-    { id: 5, name: 'Kid 5', score: 2 },
-    { id: 6, name: 'Kid 6', score: 1 },
-    { id: 7, name: 'Kid 7', score: 5 },
-    { id: 8, name: 'Kid 8', score: 4 }
-  ]);
+  const [synopsis, setSynopsis] = useState('Loading synopsis...');
+  const [userSynopsis, setUserSynopsis] = useState('');
+  const [selectedUser, setSelectedUser] = useState('');
 
-  // State to track the selected chart type (Line or Bar)
-  const [chartType, setChartType] = useState('line');
+  const [phqData] = useState(() => {
+    if (!userSessions || userSessions.length === 0) {
+      console.warn('No user sessions available');
+      return [];
+    }
+    return userSessions.map((session) => ({
+      name: session.user.split(':')[1],
+      phqScore: parseInt(session.scores.phq9_score, 10),
+      bdiScore: parseInt(session.scores.bdi_score, 10)
+    }));
+  });
+  const totalUsers = phqData.length;
+  const averagePHQScore = (phqData.reduce((acc, item) => acc + item.phqScore, 0) / totalUsers || 0).toFixed(2);
+  const averageBDIScore = (phqData.reduce((acc, item) => acc + item.bdiScore, 0) / totalUsers || 0).toFixed(2);
 
-  // Prepare chart data
+  useEffect(() => {
+    const fetchSynopsis = async () => {
+      try {
+        const response = await fetch('/api/synopsis', {
+          method: 'POST',
+          body: JSON.stringify({ phqScore: averagePHQScore, bdiScore: averageBDIScore}),
+        });
+        const reader = response.body?.getReader();
+        const chatText = await readChatResponse(reader); 
+        setSynopsis(chatText);
+      } catch (error) {
+        console.error('Error fetching synopsis:', error);
+        setSynopsis('Error fetching synopsis.');
+      }
+    };
+
+    fetchSynopsis();
+  }, []);
+  
+  const handleUserChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const userName = event.target.value;
+    setSelectedUser(userName);
+
+    try {
+      const response = await fetch('/api/synopsis1', {
+        method: 'POST',
+        body: JSON.stringify({ name: userName}),
+      });
+      const reader = response.body?.getReader();
+      const chatText = await readChatResponse(reader); 
+      setUserSynopsis(chatText);
+    } catch (error) {
+      console.error('Error fetching synopsis:', error);
+      setSynopsis('Error fetching synopsis.');
+    }
+  };
+
   const chartData = {
-    labels: phqData.map(item => item.name), // Kid names as x-axis labels
+    labels: phqData.map(item => item.name),
     datasets: [
       {
         label: 'PHQ-9 Scores',
-        data: phqData.map(item => item.score), // PHQ-9 scores as data
+        data: phqData.map(item => item.phqScore),
         borderColor: '#5999ab',
         backgroundColor: 'rgba(89, 153, 171, 0.3)',
         pointBackgroundColor: '#5999ab',
         fill: true,
         tension: 0.4
+      },
+      {
+        label: 'BDI Scores',
+        data: phqData.map(item => item.bdiScore),
+        borderColor: '#ab5959',
+        backgroundColor: 'rgba(171, 89, 89, 0.3)',
+        pointBackgroundColor: '#ab5959',
+        fill: true,
+        tension: 0.4
+      }
+    ]
+  };
+  const mildCount:number = phqData.filter(user => user.phqScore < 14).length;
+  const moderateCount:number = phqData.filter(user => user.phqScore >= 14 && user.phqScore < 20).length;
+  const severeCount:number = phqData.filter(user => user.phqScore >= 20).length;
+  const barChartData = {
+    labels: ['Mild', 'Moderate', 'Severe'],
+    datasets: [
+      {
+        label: 'Boys',
+        data: [mildCount, moderateCount, severeCount],
+        backgroundColor: 'rgba(89, 153, 171, 0.7)',
+        borderColor: '#5999ab',
+        borderWidth: 1
+      },
+      {
+        label: 'Girls',
+        data: [mildCount, moderateCount, severeCount],
+        borderColor: '#ab5959',
+        backgroundColor: 'rgba(171, 89, 89, 0.3)',
+        borderWidth: 1
       }
     ]
   };
 
-    // Group the scores and count how many kids got each score
-    const scoreCount = phqData.reduce((acc: { [key: number]: number }, item) => {
-        acc[item.score] = (acc[item.score] || 0) + 1;
-        return acc;
-      }, {});
-    
-    // Prepare chart data for horizontal bar chart
-    const barChartData = {
-        labels: Object.keys(scoreCount), // PHQ-9 scores as Y-axis labels
-        datasets: [
-          {
-            label: 'Number of Kids',
-            data: Object.values(scoreCount), // Number of kids for each score as X-axis values
-            backgroundColor: 'rgba(89, 153, 171, 0.7)', // Bar color
-            borderColor: '#5999ab',
-            borderWidth: 1,
-          }
-        ]
-    };
-
-  // Dummy stats
-  const totalUsers = phqData.length;
-  const averageScore = (phqData.reduce((acc, item) => acc + item.score, 0) / totalUsers).toFixed(2);
+  const handleExport = () => {
+    const csvData = phqData.map(item => `$${item.name},${item.phqScore},${item.bdiScore}`).join('\n');
+    const blob = new Blob([`ID,Name,PHQ-9 Score,BDI Score\n${csvData}`], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'analytics_data.csv';
+    link.click();
+  };
 
   return (
     <Layout>
-    <div className="flex flex-col h-screen bg-primary p-5">
-      <div className="max-w-4xl mx-auto w-full flex flex-col flex-1">
-        {/* Analytics Header */}
-        <div className="mb-5 flex justify-between items-center">
-          <h1 className="text-darkest text-3xl font-bold">VibeSpace Analytics 💙</h1>
-          <button className="px-4 py-2 rounded-lg bg-lighter text-darkest">Export Data</button>
-        </div>
+      <div className="flex flex-col h-screen bg-primary p-5">
+        <div className="max-w-7xl mx-auto w-full flex flex-col flex-1" style={{ height: '100%' }}>
+          <ChatHeader stars={0} level={0} profile={JSON.parse('{}')} messages={[]} />
+          <div className="flex-1 bg-lightest rounded-lg p-5 overflow-y-auto mb-5" style={{ height: '100%' }}>
+            <div className="bg-lightest rounded-lg p-5 shadow-md mb-6 flex gap-6">
+              <div className="w-1/3">
+                <h2 className="text-lg font-semibold text-darkest mb-3">Overview</h2>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <h3 className="text-md text-text">Total Users</h3>
+                    <p className="text-xl font-semibold text-darkest">{totalUsers}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-md text-text">Average PHQ-9 Score</h3>
+                    <p className="text-xl font-semibold text-darkest">{averagePHQScore}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-md text-text">Average BDI Score</h3>
+                    <p className="text-xl font-semibold text-darkest">{averageBDIScore}</p>
+                  </div>
+                </div>
+              </div>
 
-        {/* Analytics Overview */}
-        <div className="bg-lightest rounded-lg p-5 shadow-md mb-6">
-          <h2 className="text-lg font-semibold text-darkest mb-3">Overview</h2>
-          <div className="flex gap-6">
-            <div className="flex-1">
-              <h3 className="text-md text-text">Total Users</h3>
-              <p className="text-xl font-semibold text-darkest">{totalUsers}</p>
+              <div className="w-2/3">
+                <h2 className="text-lg font-semibold text-darkest mb-3">Synopsis</h2>
+                <p className="text-text">
+                  {synopsis}
+                </p>
+                <div className="mt-4">
+                  <select
+                    id="userDropdown"
+                    className="px-4 py-2 border rounded-lg bg-lighter text-text focus:ring-2 focus:ring-[#5999ab]"
+                    value={selectedUser}
+                    onChange={handleUserChange}
+                  >
+                    <option value="" disabled>
+                      Choose Student
+                    </option>
+                    {Array.from(
+                      new Map(phqData.map((user) => [user.name, user])).values()
+                    ).map((user) => (
+                      <option key={user.name} value={user.name}>
+                        {user.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-text">
+                    {userSynopsis}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="text-md text-text">Average PHQ-9 Score</h3>
-              <p className="text-xl font-semibold text-darkest">{averageScore}</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Chart Type Toggle */}
-        <div className="flex justify-between items-center mb-5">
-            <button
-              onClick={() => setChartType('line')}
-              className={`px-4 py-2 rounded-lg ${chartType === 'line' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
-            >
-              Line Chart
-            </button>
-            <button
-              onClick={() => setChartType('bar')}
-              className={`px-4 py-2 rounded-lg ${chartType === 'bar' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
-            >
-              Bar Chart
-            </button>
-        </div>
-
-        {/* Chart Section */}
-        <div className="bg-lightest rounded-lg p-5 shadow-md mb-5">
-            <h2 className="text-lg font-semibold text-darkest mb-3">PHQ-9 Scores</h2>
-            {chartType === 'line' ? (
+            <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
+              {/* Line Chart */}
+              <div className="flex-1 min-w-[45%]">
+                <h2 className="text-lg font-semibold text-darkest mb-3">Scores Comparison</h2>
                 <Line data={chartData} options={{ responsive: true }} />
-            ) : (
-                <Bar data={barChartData} options={{
-                    indexAxis: 'y', // Make it a horizontal bar chart
+              </div>
+
+              {/* Bar Chart */}
+              <div className="flex-1 min-w-[45%]">
+                <h2 className="text-lg font-semibold text-darkest mb-3">PHQ9 Distribution</h2>
+                <Bar
+                  data={barChartData}
+                  options={{
+                    indexAxis: 'x',
                     responsive: true,
                     scales: {
                       x: {
                         title: {
                           display: true,
-                          text: 'Number of Kids'
-                        }
+                          text: 'PHQ-9 Bands',
+                        },
+                        min: 0,
+                        max: 11,
+                        ticks: {
+                          stepSize: 1,
+                        },
                       },
                       y: {
                         title: {
                           display: true,
-                          text: 'PHQ-9 Scores'
-                        }
-                      }
-                    }
-                  }} />
-            )}
-        </div>
+                          text: 'Number of Users',
+                        },
+                        min: 0,
+                        ticks: {
+                          stepSize: 1,
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </div>
 
-        {/* Additional Analytics or Details */}
-        <div className="bg-lightest rounded-lg p-5 shadow-md">
-          <h2 className="text-lg font-semibold text-darkest mb-3">Details</h2>
-          <p className="text-text">
-            This page shows the PHQ-9 ratings for all kids who used the bot. Use the graph above to see the trends in mood ratings.
-            You can also export this data for further analysis by clicking the Export Data button.
-          </p>
+
+            <div className="bg-lightest rounded-lg p-5 shadow-md">
+              <h2 className="text-lg font-semibold text-darkest mb-3">Details</h2>
+              <p className="text-text">
+                This page shows the PHQ-9 and BDI ratings for all users. Use the graph above to see the trends in mood ratings.
+                You can also export this data for further analysis by clicking the Export Data button.
+              </p>
+            </div>
+            <div className="flex justify-end mt-5">
+              <button
+                onClick={handleExport}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+              >
+                Export Data
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
     </Layout>
   );
 };

@@ -1,21 +1,59 @@
-"use client"
 import React, { useState } from "react";
 import { useRouter } from 'next/navigation'; // Use Next.js router
 import {
     Star,
     Trophy,
   } from "lucide-react";
+interface Profile {
+    username: string;
+    grade: string;  
+    gender: string;
+}
+interface Message {
+    id: number;
+    text: string;
+    sender: string;
+    timestamp: string;
+}
 interface GameProps {
     stars: number;
     level: number;
+    profile: Profile;
+    messages: Message[],
 }
+
 export default function ChatHeader(gameState: GameProps) {
     const [showInfo, setShowInfo] = useState(false);
     const router = useRouter();
+
+    const handleExit = async () => {
+        try {
+            // Submit profile data to a backend or endpoint (e.g., /api/submit-profile)
+            const response = await fetch('/api/exit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({'profile': gameState.profile, 'messages': gameState.messages}), // Send the profile data
+            });
+            if (!response.ok) {
+                console.error('Failed to submit profile');
+            }
+        } catch (error) {
+            console.error('Error submitting profile:', error);
+        } finally {
+            window.location.href = '/login';
+        }
+    };
+    const handleExplorer = async () => {
+        window.location.href = '/explorer';
+    };
+
+
     return (
         <>
         <div className="flex justify-between items-center mb-2">
-            <h1 className="text-darkest text-4xl font-bold m-0" onClick={ ()=> router.push('/')}>VibeSpace  <span style={{ animation: 'pumpHeart 1s infinite' }}>💙</span></h1>
+            <h1 className="text-darkest text-4xl font-bold m-0" onClick={ ()=> router.push('/')}>Elev8 Mind  <span style={{ animation: 'pumpHeart 1s infinite' }}>💙</span></h1>
             {gameState.level!=0 && (
             <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
@@ -31,7 +69,7 @@ export default function ChatHeader(gameState: GameProps) {
             <div>
             {gameState.level==0 && (
                 <button
-                    onClick={() => router.push('/explorer')}
+                    onClick={handleExplorer}
                     className="px-4 py-1 rounded-lg border-1 cursor-pointer ml-2 bg-lighter text-darkest shadow-lg"
                 >
                     📊 Mood Meter
@@ -39,7 +77,7 @@ export default function ChatHeader(gameState: GameProps) {
             )}
             {gameState.level!=0 && (
                 <button
-                    onClick={() => router.push('/')}
+                    onClick={() => router.replace('/dashboard')}
                     className="px-4 py-1 rounded-lg border-1 cursor-pointer ml-2 bg-lighter text-darkest shadow-lg"
                 >
                     📊 Quest
@@ -53,7 +91,7 @@ export default function ChatHeader(gameState: GameProps) {
                     ℹ️
                 </button>
                 <button
-                    onClick={() => router.push('/login')}
+                    onClick={handleExit}
                     className="px-4 py-1 rounded-lg border-1 cursor-pointer ml-2 bg-lighter text-darkest shadow-lg"
                 >
                    🚪➡️ 
@@ -63,9 +101,9 @@ export default function ChatHeader(gameState: GameProps) {
 
         {showInfo && (
             <div className="p-4 bg-lightest rounded-lg mb-5">
-                <h3 className="m-0 mb-2 text-darkest">About VibeSpace 💙</h3>
+                <h3 className="m-0 mb-2 text-darkest">About Elev8 Mind 💙</h3>
                 <p className="m-0 text-text">
-                    VibeSpace analyzes conversation patterns to help identify early
+                    Elev8 Mind analyzes conversation patterns to help identify early
                     signs of depression. This is a prototype - for mental health
                     concerns, please reach out to a mental health professional. 🏥
                 </p>
