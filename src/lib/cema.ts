@@ -85,9 +85,8 @@ function getSymptomfromId(symptomId: string): Symptom {
  * @param symptomsCovered 
  * @returns 
  */
-function getKeywordsForCurrentSymptomBasedOnSeverity(
+function getKeywordsForCurrentSymptom(
     symptomId: string,
-    severity: number, 
     symptomsCovered: string[]): SymptomSelection|null {
       const count:number = symptomsCovered.filter(s => (s.indexOf(symptomId)!=-1)).length;
       if (count==2 ) {
@@ -160,19 +159,17 @@ function getNextSymptomOutsideEmotion(symptomsCovered: string[]): Symptom | null
  */
 export function getKeywords(
     currentSymptomId: string,
-    severity: number,
     symptomsCovered: string[]): SymptomSelection{ 
-      severity = 2; // TODO delete
       if(currentSymptomId=="") {
         currentSymptomId = symptomsCovered[0];
       }
-      let keywords = getKeywordsForCurrentSymptomBasedOnSeverity(currentSymptomId, severity, symptomsCovered);
+      let keywords = getKeywordsForCurrentSymptom(currentSymptomId, symptomsCovered);
       if(keywords) {
         return keywords
       } else {
         let symptom = getNextSymptomInEmotion(currentSymptomId);
         if(symptom!=null) {
-          keywords = getKeywordsForCurrentSymptomBasedOnSeverity(symptom.id, severity, symptomsCovered);
+          keywords = getKeywordsForCurrentSymptom(symptom.id, symptomsCovered);
           if(keywords) {
             return keywords;
           } // else all categories for the symptom are accounted 
@@ -180,7 +177,7 @@ export function getKeywords(
         }
         symptom = getNextSymptomOutsideEmotion(symptomsCovered);
         if(symptom!=null) {
-          return getKeywords(symptom.id, severity, symptomsCovered);
+          return getKeywords(symptom.id, symptomsCovered);
         } else {
           return {symptomCovered: "END", keywords: []};
         }

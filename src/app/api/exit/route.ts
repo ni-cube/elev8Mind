@@ -5,6 +5,7 @@ import { systemMessage } from "./_constants";
 import { readChatResponse } from "@/utils/util";
 import FileConfig from "@/lib/config/FileConfig";
 import { Profile } from "@/types/profile";
+import { llm } from "../_constants";
 
 export async function POST(req: NextRequest) {
   const body = await req.json(); // Parse the JSON once
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
         };
 
   const result = await streamText({
-    model: openai("gpt-3.5-turbo"),
+    model: openai(llm),
     messages: [systemMsg],
   });
   const streamResponse = await result.toDataStreamResponse();

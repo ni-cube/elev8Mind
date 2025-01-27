@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { getCategoryOf2ndLastSymptomsCovered, getSymptomfromEmotionId, getKeywords } from "@/lib/cema";
 import { helpMessage } from "../utils/genericMessage";
 import { readChatResponse } from "@/utils/util";
-import { Profile } from "@/types/profile";
 import { emotionEmojis, commonEmojis } from "@/utils/emotions";
 
 interface Message {
@@ -13,8 +12,7 @@ interface Message {
 }
 interface ChatState {
   symptomsCovered: string[],
-  currentSymptomId: string,
-  currentSeverity: number,
+  currentSymptomId: string
 }
 interface SymptomSelection {
   symptomCovered:string, 
@@ -23,19 +21,16 @@ interface SymptomSelection {
 export default function ChatPrompt({ messages, setMessages }: { messages: Message[], setMessages: React.Dispatch<React.SetStateAction<Message[]>> }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [ emoji, setEmoji ] = useState("");
-  const [profile, setProfile] = useState<Profile>({} as Profile);
   const [isMute, setIsMute] = useState(true);
   const [inputText, setInputText] = useState("");
   const [generatingText, setGeneratingText] = useState<boolean>(false);
 
   useEffect(() => {
     const profile = JSON.parse(localStorage.getItem('profile') || '{}');
-    setProfile(profile);
     const symptomId = getSymptomfromEmotionId(profile.emotKey).id;
     setChatState({
       symptomsCovered: [symptomId + "_L"],
-      currentSymptomId: symptomId,
-      currentSeverity: 0,
+      currentSymptomId: symptomId
     });
     setEmoji(emotionEmojis[profile.emotKey as keyof typeof emotionEmojis].emoji);
   }, []);
@@ -43,7 +38,6 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
   const [chatState, setChatState] = useState<ChatState>({
     symptomsCovered: ["Angry" + "_L"],
     currentSymptomId: "Angry",
-    currentSeverity: 0,
   });
   //const [symptomsCovered, setSymptomsCovered] = useState<string[]>([]);
 
@@ -54,8 +48,6 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
     setShowEmojiPicker(false);
   };
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const severity = 2;
 
   const fetchVoice = async (text: string) => {
     try {
@@ -87,6 +79,28 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
     }
   };
 
+  const fetchSeverity = async (data: Message[]) => {
+    try {
+      const response = await fetch("/api/emotional-severity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch severity");
+      }
+  
+      const result = await response.json();
+      return result.severity; // Return the severity for further use if needed
+    } catch (error) {
+      console.error("Error:", error);
+      throw error; // Rethrow the error to handle it outside this function if necessary
+    }
+  };
+
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (!inputText.trim()) return;
@@ -101,11 +115,8 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
     
     try {
       setGeneratingText(true);
-
-      console.log("Ni3 Input - " + JSON.stringify(chatState));
-      const symptomSelected:SymptomSelection = getKeywords(chatState.currentSymptomId, chatState.currentSeverity, chatState.symptomsCovered);
-      console.log("Ni3 Output - " + JSON.stringify(symptomSelected));  
-      console.log("User Input - " + inputText);  
+      const symptomSelected:SymptomSelection = getKeywords(chatState.currentSymptomId, chatState.symptomsCovered);
+      
       // Send the message to the backend API using Fetch (for streaming)
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -119,7 +130,7 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
           ],
           "keywords": (symptomSelected!=null)?symptomSelected.keywords: [],
           "old_keywords": getCategoryOf2ndLastSymptomsCovered(chatState.symptomsCovered),
-          "profile": profile,
+          "severity": fetchSeverity(messages),
         }),
       });
       // If the response is a stream, handle the stream (Real-time update)
@@ -137,7 +148,6 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
             ...prev,
             symptomsCovered: [...prev.symptomsCovered, symptomSelected.symptomCovered],
             currentSymptomId: symptomSelected.symptomCovered.replace("_H", "").replace("_L", ""),
-            currentSeverity: severity,
           }));
         }
 
