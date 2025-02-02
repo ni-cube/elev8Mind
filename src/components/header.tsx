@@ -45,6 +45,9 @@ export default function ChatHeader(gameState: GameProps) {
             window.location.href = '/login';
         }
     };
+    const handleLogin = async () => {
+        window.location.href = '/login';
+    };
     const handleExplorer = async () => {
         window.location.href = '/explorer';
     };
@@ -53,7 +56,7 @@ export default function ChatHeader(gameState: GameProps) {
     return (
         <>
         <div className="flex justify-between items-center mb-2">
-            <h1 className="text-darkest text-4xl font-bold m-0" onClick={ ()=> router.push('/')}>Elev8 Mind  <span style={{ animation: 'pumpHeart 1s infinite' }}>💙</span></h1>
+            <h1 className="text-darkest text-4xl font-bold m-0" onClick={handleLogin}>Elev8 Mind  <span style={{ animation: 'pumpHeart 1s infinite' }}>💙</span></h1>
             {gameState.level!=0 && (
             <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">

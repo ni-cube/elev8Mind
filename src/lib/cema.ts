@@ -163,6 +163,9 @@ export function getKeywords(
       if(currentSymptomId=="") {
         currentSymptomId = symptomsCovered[0];
       }
+      if(symptomsCovered.find(s => s.indexOf("Suicidal_H")!=-1)) {
+        return {symptomCovered: "END", keywords: []};
+      }
       let keywords = getKeywordsForCurrentSymptom(currentSymptomId, symptomsCovered);
       if(keywords) {
         return keywords

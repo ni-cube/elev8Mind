@@ -21,6 +21,9 @@ export async function POST(req: NextRequest) {
   });
   if(keywords.length==0) { // end of conversation
     combinedMessages = [finalSystemMessage, ...formattedMessages];
+    const systemMsg: { role: 'system'; content: string }  = { 
+      role: "system", content : finalSystemMessage};
+    combinedMessages = [systemMsg, ...formattedMessages];
   } else {
     const systemMsg: { role: 'system'; content: string }  = { 
       role: "system", content : systemMessage

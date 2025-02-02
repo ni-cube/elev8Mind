@@ -115,31 +115,39 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
     
     try {
       setGeneratingText(true);
+      console.log("Ni3 Input - " + JSON.stringify(chatState));
       const symptomSelected:SymptomSelection = getKeywords(chatState.currentSymptomId, chatState.symptomsCovered);
       
-      // Send the message to the backend API using Fetch (for streaming)
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: [
-            ...messages, //.filter((msg: Message) => msg.sender === "user"),
-            userMessage,
-          ],
-          "keywords": (symptomSelected!=null)?symptomSelected.keywords: [],
-          "old_keywords": getCategoryOf2ndLastSymptomsCovered(chatState.symptomsCovered),
-          "severity": fetchSeverity(messages),
-        }),
-      });
-      // If the response is a stream, handle the stream (Real-time update)
-      const reader = response.body?.getReader();
-      let chatText = await readChatResponse(reader);  
-  
+      console.log("Ni3 Output - " + JSON.stringify(symptomSelected));  
+      let chatText = "";
+      if(symptomSelected.symptomCovered==='Suicidal_H') {
+        chatText = "Help is available.";
+      } else {
+        // Send the message to the backend API using Fetch (for streaming)
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages: [
+              ...messages, //.filter((msg: Message) => msg.sender === "user"),
+              userMessage,
+            ],
+            "keywords": (symptomSelected!=null)?symptomSelected.keywords: [],
+            "old_keywords": getCategoryOf2ndLastSymptomsCovered(chatState.symptomsCovered),
+            "severity": fetchSeverity(messages),
+          }),
+        });
+        // If the response is a stream, handle the stream (Real-time update)
+        const reader = response.body?.getReader();
+        chatText = await readChatResponse(reader);  
+      }
       (async () => {
         if(chatText.startsWith("Help is available.")) {
           chatText = helpMessage;
+        } else if(chatText.indexOf("crisis helpline")!=-1) {  
+          chatText += ("\n" + helpMessage);          
         } else if(chatText.indexOf("Thank you. I'm here to help whenever you need me.")!=-1) {
           chatText = "Thank you. I'm here to help whenever you need me. 💙";
         }
