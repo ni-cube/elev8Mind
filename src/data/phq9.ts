@@ -7,7 +7,7 @@ export const phq9 = [
           keywords: {
             categories: [
               ["bored", "unmotivated", "disinterested", "detached"],
-              ["I don’t enjoy anything", "Everything feels dull", "I have no interest in activities"]
+              ["chronic lack of motivation", "persistent disinterest ", "enduring emotional detachment"]
             ]
           },
         },
@@ -16,7 +16,7 @@ export const phq9 = [
           keywords: {
               categories: [
                   ["overeating", "loss of appetite", "weight loss", "weight gain"],
-                  ["lost interest in food"]
+                  ["persistent overeating", "Chronic loss of appetite", "enduring weight loss", "long-term weight gain", "on-going changes in appetite"]  
               ]
           }
         } 
@@ -30,7 +30,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["restless", "fidgety", "can't sit still"],
-                  ["I Tfeel agitated", "I can't relax", "I'm always on edge"]
+                  ["persistent restlessness", "chronic fidgeting", "enduring inability to sit still"]
               ]
           }
         },
@@ -39,7 +39,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["aggressive", "violent", "hostile", "irritable", "confrontational"],
-                  ["I feel like hitting someone", "I can't control my anger", "Everyone annoys me"]
+                  ["persistent aggression", "chronic hostility", "enduring irritability", "long-term confrontational behavior", "ongoing violent tendencies"]
               ]
           }
         }
@@ -53,7 +53,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["confused", "distracted", "forgetful", "unfocused", "indecisive"],
-                  ["I can’t focus on anything", "Making decisions is hard", "I struggle to concentrate"]
+                  ["urelenting mental fog", "ongoing indecisiveness", "enduring forgetfulness", "persistent confusion", "chronic distraction"]
               ]
           }
         },
@@ -62,7 +62,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["indecisive", "uncertain", "hesitant"],
-                  ["I can't make decisions", "I'm unsure about everything", "I hesitate too much"]
+                  ["unrelenting ambivalence", "long-term self-doubt", "ongoing wavering"]
               ]
           }
         }
@@ -76,7 +76,7 @@ export const phq9 = [
           keywords: {
             categories: [
               ["tired", "exhausted", "drained", "weary", "overwhelmed"],
-              ["I have no energy", "I’m always tired", "I can't keep up with daily tasks"]
+              ["long-term fatigue", "ongoing drained feeling", "unrelenting overwhelm", "chronic exhaustion" ]
             ]
           },
         },
@@ -85,7 +85,7 @@ export const phq9 = [
           keywords: {
             categories: [
               ["insomnia", "restless", "drowsy", "oversleeping"],
-              ["I can’t fall asleep", "I sleep all the time", "I wake up too early"]
+              ["chronic insomnia", "persistent drowsiness", "prolonged sleep-related issues"]
             ]
           },
         },
@@ -94,7 +94,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["headaches", "backaches", "stomachaches", "muscle pain"],
-                  ["I have constant aches", "My body hurts all over", "I feel physically ill"]
+                  ["long-term physical discomfort", "chronic headaches", "persistent muscle pain"]
               ]
           }
         }, 
@@ -108,7 +108,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["failure", "loser", "shame", "useless", "inferior"],
-                  ["I feel like a burden", "I’m not good enough", "I hate myself"]
+                  ["persistent feelings of failure", "chronic shame", "enduring feelings of inferiority"]
               ]
           }
         },
@@ -117,7 +117,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["self-blame", "self-criticism", "self-hate"],
-                  ["I blame myself for everything", "I'm overly critical of myself", "I hate who I am"]
+                  ["persistent self-blame", "chronic self-criticism", "enduring self-hate"]
               ]
           }
         }
@@ -131,7 +131,7 @@ export const phq9 = [
               keywords: {
               categories: [
                   ["die", "suicide", "end it", "kill myself", "no reason to live"],
-                  ["I don’t want to be here anymore", "I wish I were gone", "Life isn't worth living"]
+                  ["persistent suicidal thoughtsg", "chronic feelings of hopelessness", "enduring thoughts of self-harm"]
               ]
           }
         },

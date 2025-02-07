@@ -148,52 +148,12 @@ const AnalyticsPage = () => {
     }
   };
 
-  const chartData = {
-    labels: phqData.map(item => item.name),
-    datasets: [
-      {
-        label: 'PHQ-9 Scores',
-        data: phqData.map(item => item.phqScore),
-        borderColor: '#5999ab',
-        backgroundColor: 'rgba(89, 153, 171, 0.3)',
-        pointBackgroundColor: '#5999ab',
-        fill: true,
-        tension: 0.4
-      },
-      {
-        label: 'BDI Scores',
-        data: phqData.map(item => item.bdiScore),
-        borderColor: '#ab5959',
-        backgroundColor: 'rgba(171, 89, 89, 0.3)',
-        pointBackgroundColor: '#ab5959',
-        fill: true,
-        tension: 0.4
-      }
-    ]
-  };
- 
   const generateRandomColor = () => {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
     return `rgb(${r}, ${g}, ${b})`;
   }
-  const studentsWithMultipleSessions = phqData.filter(user => user.count > 1)
-        .map((item: { name: string}) => ({
-          label: item.name,
-          data: studentData(item.name).map((item: { phqScore: number; }) => item.phqScore),
-          borderColor: generateRandomColor(),
-          backgroundColor: `${generateRandomColor()}80`,
-          pointBackgroundColor: generateRandomColor(),
-          fill: false,
-          tension: 0.4
-  }))
-  
-
-  const driftData = {
-    labels: ['1','2','3,','4','5','6','7'],
-    datasets: studentsWithMultipleSessions
-  };
 
   type FilterFunction = (user: PHQData, group: string) => boolean;
 
@@ -206,20 +166,68 @@ const AnalyticsPage = () => {
       phq9BarChartData[`${group}`] = [
         users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.confused || 0), 10), 0),
         users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.angry || 0), 10), 0),
-        users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.despair || 0), 10), 0),
+        users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.despair || 0), 10) + parseInt(String(user.phq9Categories.hopelessness || 0), 10), 0),
         users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.disconnected || 0), 10), 0),
-        users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.exhausted || 0), 10), 0),
-        users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.hopelessness || 0), 10), 0)
+        users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.exhausted || 0), 10), 0)
       ];
+      
+      // calculate average
+      // phq9BarChartData[`${group}`].map((val, index) => phq9BarChartData[`${group}`][index] = (phq9BarChartData[`${group}`][index]/users.length))
+
+      phq9BarChartData[`${group}`].map((val, index) => phq9BarChartData[`${group}`][index] = phq9BarChartData[`${group}`][index]*100);
     });
     return phq9BarChartData;
   };
 
+  const phq9DataChartDataForSchool = ['confused', 'angry', 'despair', 'disconnected', 'exhausted', 'hopelessness']
+    .map((key) => ({
+      label: key,
+      data: phqData.map(item => parseInt(item.phq9Categories[key] || "0", 10).toString()),
+      borderColor: generateRandomColor(),
+      backgroundColor: `${generateRandomColor()}80`,
+      pointBackgroundColor: generateRandomColor(),
+      fill: false,
+      tension: 0.4
+    }));
+ 
+  const studentsWithMultipleSessions = phqData.filter(user => user.count > 1)
+        .map((item: { name: string}) => ({
+          label: item.name,
+          data: studentData(item.name).map((item: { phqScore: number; }) => item.phqScore),
+          borderColor: generateRandomColor(),
+          backgroundColor: `${generateRandomColor()}80`,
+          pointBackgroundColor: generateRandomColor(),
+          fill: false,
+          tension: 0.4
+  }));
+  
+
+
+
+
+  const driftData = {
+    labels: ['1','2','3,','4','5','6','7'],
+    datasets: studentsWithMultipleSessions
+  };
+
+
   const phq9BarChartDataByGender = generatePHQ9BarChartData(['Male', 'Female'], (user, gender) => user.gender===gender);
   const phq9BarChartDataByGrade = generatePHQ9BarChartData(['9', '10', '11', '12'], (user, grade) => user.grade===grade);
-
+  const phq9BarChartDataForSchool = generatePHQ9BarChartData(['1'], () => true);
+  const phq9BarChartForSchool = {
+    labels: ['Confusion', 'Agressive Behaviors', 'Hopelessness', 'Anhedonia (Loss of Interest)', 'Fatigue and Sleep Disturbances'],
+    datasets: [
+      {
+        label: 'Emotional Categrories',
+        data: phq9BarChartDataForSchool['1'],
+        backgroundColor: 'rgba(89, 153, 171, 0.7)',
+        borderColor: '#5999ab',
+        borderWidth: 1
+      }
+    ]
+  };
   const phq9BarChartByGender = {
-    labels: ['Confused', 'Angry', 'Despair', 'Disconnected', 'Exhausted', 'Hopelessness'],
+    labels: ['Confusion', 'Agressive Behaviors', 'Hopelessness', 'Anhedonia (Loss of Interest)', 'Fatigue and Sleep Disturbances'],
     datasets: [
       {
         label: 'Boys',
@@ -239,33 +247,33 @@ const AnalyticsPage = () => {
   };
 
   const phq9BarChartByGrade = {
-    labels: ['Confused', 'Angry', 'Despair', 'Disconnected', 'Exhausted', 'Hopelessness'],
+    labels: ['Confusion', 'Agressive Behaviors', 'Hopelessness', 'Anhedonia (Loss of Interest)', 'Fatigue and Sleep Disturbances'],
     datasets: [
       {
-        label: 'Nine',
+        label: '9',
         data: phq9BarChartDataByGrade['9'],
-        backgroundColor: 'rgba(165, 190, 197, 0.7)',
+        backgroundColor: 'rgba(15, 103, 128, 0.7)',
         borderColor: '#2c5f66',
         borderWidth: 1
       },
       {
-        label: 'Ten',
+        label: '10',
         data: phq9BarChartDataByGrade['10'],
-        backgroundColor: 'rgba(113, 159, 172, 0.7)',
+        backgroundColor: 'rgba(195, 201, 130, 0.7)',
         borderColor: '#1f4d57',
         borderWidth: 1
       },
       {
-        label: 'Eleven',
+        label: '11',
         data: phq9BarChartDataByGrade['11'],
-        backgroundColor: 'rgba(89, 153, 171, 0.7)',
+        backgroundColor: 'rgba(171, 89, 130, 0.7)',
         borderColor: '#17434a',
         borderWidth: 1
       },
       {
-        label: 'Twelve',
+        label: '12',
         data: phq9BarChartDataByGrade['12'],
-        backgroundColor: 'rgba(34, 137, 166, 0.7)',
+        backgroundColor: 'rgba(54, 34, 166, 0.7)',
         borderColor: '#0d3840',
         borderWidth: 1
       }         
@@ -339,8 +347,11 @@ const AnalyticsPage = () => {
             <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
               {/* Line Chart */}
               <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">Scores Comparison</h2>
-                <Line data={chartData} options={{ responsive: true }} />
+                <h2 className="text-lg font-semibold text-darkest mb-3">Emotional Comparison</h2>
+                <Line data={{
+                    labels: phqData.map((val, index) => "#" + index),
+                    datasets: phq9DataChartDataForSchool
+                }} options={{ responsive: true }} />
               </div>
 
               {/* Bar Chart */}
@@ -366,7 +377,7 @@ const AnalyticsPage = () => {
                       y: {
                         title: {
                           display: true,
-                          text: 'Number of Users',
+                          text: 'Average Score',
                         },
                         min: 0,
                         ticks: {
@@ -378,6 +389,48 @@ const AnalyticsPage = () => {
                 />
               </div>
             </div>
+
+            <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
+              {/* Line Chart */}
+              <div className="flex-1 min-w-[45%]">
+                <h2 className="text-lg font-semibold text-darkest mb-3">Emotional Comparison</h2>
+                <Line data={{
+                    labels: phqData.map((val, index) => "#" + index),
+                    datasets: phq9DataChartDataForSchool
+                }} options={{ responsive: true }} />
+              </div>
+              {/* Line Chart */}
+              <div className="flex-1 min-w-[45%]">
+                <h2 className="text-lg font-semibold text-darkest mb-3">Emotional Categories Distribution</h2>
+                <Bar
+                  data={phq9BarChartForSchool}
+                  options={{
+                    indexAxis: 'x',
+                    responsive: true,
+                    scales: {
+                      x: {
+                        min: 0,
+                        max: 11,
+                        ticks: {
+                          stepSize: 1,
+                        },
+                      },
+                      y: {
+                        title: {
+                          display: true,
+                          text: 'PHQ-9 Scores',
+                        },
+                        min: 0,
+                        ticks: {
+                          stepSize: 1,
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </div>
+
             <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
               {/* Line Chart */}
               <div className="flex-1 min-w-[45%]">
@@ -436,7 +489,7 @@ const AnalyticsPage = () => {
                       y: {
                         title: {
                           display: true,
-                          text: 'Number of Users',
+                          text: 'Average Score',
                         },
                         min: 0,
                         ticks: {
