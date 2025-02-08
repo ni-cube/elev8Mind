@@ -2,47 +2,11 @@ export const userSessions = [
   {
     "user": "scores:tester1:2025-01-01T08:11:42.005Z",
     "scores": {
-      "phq9_score": "23",
+      "phq9_score": "29",
       "bdi_score": "35",
       "phq9_categories": {
-        "confused": "3",
-        "hopelessness": "7",
-        "exhausted": "7",
-        "disconnected": "2",
-        "angry": "4",
-        "despair": "0"
-      },
-      "message": "I feel completely worthless, and I’ve started avoiding my responsibilities altogether.",
-      "gender": "Female",
-      "grade": "9"
-    }
-  },
-  {
-    "user": "scores:tester2:2025-01-02T09:15:23.005Z",
-    "scores": {
-      "phq9_score": "18",
-      "bdi_score": "28",
-      "phq9_categories": {
-        "confused": "3",
-        "hopelessness": "2",
-        "exhausted": "7",
-        "disconnected": "2",
-        "angry": "4",
-        "despair": "0"
-      },
-      "message": "I have lost interest in almost everything and feel hopeless about my future.",
-      "gender": "Male",
-      "grade": "9"
-    }
-  },
-  {
-    "user": "scores:tester3:2025-01-03T10:20:12.005Z",
-    "scores": {
-      "phq9_score": "23",
-      "bdi_score": "35",
-      "phq9_categories": {
-        "confused": "2",
-        "hopelessness": "7",
+        "confused": "7",
+        "hopelessness": "8",
         "exhausted": "7",
         "disconnected": "2",
         "angry": "5",
@@ -54,16 +18,52 @@ export const userSessions = [
     }
   },
   {
-    "user": "scores:tester4:2025-01-04T11:25:35.005Z",
+    "user": "scores:tester2:2025-01-02T09:15:23.005Z",
     "scores": {
       "phq9_score": "22",
-      "bdi_score": "34",
+      "bdi_score": "28",
       "phq9_categories": {
-        "confused": "2",
-        "hopelessness": "7",
+        "confused": "5",
+        "hopelessness": "3",
         "exhausted": "7",
         "disconnected": "2",
-        "angry": "4",
+        "angry": "5",
+        "despair": "0"
+      },
+      "message": "I have lost interest in almost everything and feel hopeless about my future.",
+      "gender": "Male",
+      "grade": "9"
+    }
+  },
+  {
+    "user": "scores:tester3:2025-01-03T10:20:12.005Z",
+    "scores": {
+      "phq9_score": "28",
+      "bdi_score": "35",
+      "phq9_categories": {
+        "confused": "5",
+        "hopelessness": "1",
+        "exhausted": "7",
+        "disconnected": "2",
+        "angry": "1",
+        "despair": "0"
+      },
+      "message": "I feel completely worthless, and I’ve started avoiding my responsibilities altogether.",
+      "gender": "Female",
+      "grade": "9"
+    }
+  },
+  {
+    "user": "scores:tester4:2025-01-04T11:25:35.005Z",
+    "scores": {
+      "phq9_score": "27",
+      "bdi_score": "34",
+      "phq9_categories": {
+        "confused": "5",
+        "hopelessness": "8",
+        "exhausted": "7",
+        "disconnected": "2",
+        "angry": "5",
         "despair": "0"
       },
       "message": "Everything feels meaningless, and I struggle to find joy even in activities I once loved.",
@@ -74,14 +74,14 @@ export const userSessions = [
   {
     "user": "scores:tester5:2025-01-05T12:30:42.005Z",
     "scores": {
-      "phq9_score": "9",
+      "phq9_score": "14",
       "bdi_score": "15",
       "phq9_categories": {
-        "confused": "2",
-        "hopelessness": "3",
+        "confused": "5",
+        "hopelessness": "4",
         "exhausted": "2",
         "disconnected": "1",
-        "angry": "1",
+        "angry": "2",
         "despair": "0"
       },
       "message": "I occasionally feel sad, especially in the evenings, but am generally able to cope with my routine.",
@@ -92,14 +92,14 @@ export const userSessions = [
   {
     "user": "scores:tester6:2025-01-06T13:35:21.005Z",
     "scores": {
-      "phq9_score": "20",
+      "phq9_score": "25",
       "bdi_score": "30",
       "phq9_categories": {
-        "confused": "5",
-        "hopelessness": "4",
+        "confused": "8",
+        "hopelessness": "5",
         "exhausted": "5",
         "disconnected": "2",
-        "angry": "4",
+        "angry": "5",
         "despair": "0"
       },
       "message": "I feel a heavy weight on my chest constantly, and I have trouble concentrating on work or hobbies.",
@@ -110,14 +110,14 @@ export const userSessions = [
   {
     "user": "scores:tester7:2025-01-07T14:40:10.005Z",
     "scores": {
-      "phq9_score": "7",
+      "phq9_score": "12",
       "bdi_score": "12",
       "phq9_categories": {
-        "confused": "1",
-        "hopelessness": "2",
+        "confused": "4",
+        "hopelessness": "3",
         "exhausted": "1",
         "disconnected": "2",
-        "angry": "1",
+        "angry": "2",
         "despair": "0"
       },
       "message": "I feel mildly anxious on some days, but overall, I am managing things well.",
@@ -128,14 +128,14 @@ export const userSessions = [
   {
     "user": "scores:tester8:2025-01-08T15:45:05.005Z",
     "scores": {
-      "phq9_score": "25",
+      "phq9_score": "30",
       "bdi_score": "37",
       "phq9_categories": {
-        "confused": "5",
-        "hopelessness": "7",
+        "confused": "8",
+        "hopelessness": "8",
         "exhausted": "7",
         "disconnected": "2",
-        "angry": "4",
+        "angry": "5",
         "despair": "0"
       },
       "message": "I feel completely detached from reality, and even getting out of bed feels like an impossible task.",
@@ -254,13 +254,13 @@ export const userSessions = [
   {
     "user": "scores:tester15:2025-01-15T22:18:11.005Z",
     "scores": {
-      "phq9_score": "19",
+      "phq9_score": "24",
       "phq9_categories": {
-        "confused": "3",
-        "hopelessness": "4",
+        "confused": "6",
+        "hopelessness": "5",
         "exhausted": "5",
         "disconnected": "3",
-        "angry": "4",
+        "angry": "5",
         "despair": "0"
       },
       "bdi_score": "29",
@@ -308,14 +308,14 @@ export const userSessions = [
   {
     "user": "scores:tester15:2025-01-18T07:30:15.005Z",
     "scores": {
-      "phq9_score": "23",
+      "phq9_score": "28",
       "bdi_score": "35",
       "phq9_categories": {
-        "confused": "2",
-        "hopelessness": "1",
+        "confused": "5",
+        "hopelessness": "2",
         "exhausted": "8",
         "disconnected": "8",
-        "angry": "4",
+        "angry": "5",
         "despair": "0"
       },
       "message": "I feel completely worthless, and I’ve started avoiding my responsibilities altogether.",
@@ -326,14 +326,14 @@ export const userSessions = [
   {
     "user": "scores:tester15:2025-01-19T08:35:10.005Z",
     "scores": {
-      "phq9_score": "17",
+      "phq9_score": "22",
       "bdi_score": "26",
       "phq9_categories": {
-        "confused": "2",
-        "hopelessness": "8",
+        "confused": "5",
+        "hopelessness": "9",
         "exhausted": "4",
         "disconnected": "2",
-        "angry": "1",
+        "angry": "2",
         "despair": "0"
       },
       "message": "I feel like I’m barely holding on, and I often find myself doubting my abilities.",
@@ -344,14 +344,14 @@ export const userSessions = [
   {
     "user": "scores:tester12:2025-01-20T09:40:05.005Z",
     "scores": {
-      "phq9_score": "6",
+      "phq9_score": "11",
       "bdi_score": "10",
       "phq9_categories": {
-        "confused": "0",
-        "hopelessness": "1",
+        "confused": "3",
+        "hopelessness": "2",
         "exhausted": "4",
         "disconnected": "0",
-        "angry": "1",
+        "angry": "2",
         "despair": "0"
       },
       "message": "I generally feel okay, but I have occasional moments of sadness or worry.",

@@ -23,12 +23,6 @@ export const emotionEmojis = {
       emoji: "😡",
       mood: "Angry",
       response: "I understand you're feeling frustrated. What's on your mind?",
-    },
-    sadness: {
-      emoji: "🌧️",
-      mood: "Despair",
-      response:
-        "It sounds like you're feeling really down. How can I support you right now?",
     }
   };
 

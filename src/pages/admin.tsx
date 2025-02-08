@@ -172,23 +172,12 @@ const AnalyticsPage = () => {
       ];
       
       // calculate average
-      // phq9BarChartData[`${group}`].map((val, index) => phq9BarChartData[`${group}`][index] = (phq9BarChartData[`${group}`][index]/users.length))
+      phq9BarChartData[`${group}`].map((val, index) => phq9BarChartData[`${group}`][index] = (phq9BarChartData[`${group}`][index]/users.length))
 
-      phq9BarChartData[`${group}`].map((val, index) => phq9BarChartData[`${group}`][index] = phq9BarChartData[`${group}`][index]*100);
+      //phq9BarChartData[`${group}`].map((val, index) => phq9BarChartData[`${group}`][index] = phq9BarChartData[`${group}`][index]*100);
     });
     return phq9BarChartData;
   };
-
-  const phq9DataChartDataForSchool = ['confused', 'angry', 'despair', 'disconnected', 'exhausted', 'hopelessness']
-    .map((key) => ({
-      label: key,
-      data: phqData.map(item => parseInt(item.phq9Categories[key] || "0", 10).toString()),
-      borderColor: generateRandomColor(),
-      backgroundColor: `${generateRandomColor()}80`,
-      pointBackgroundColor: generateRandomColor(),
-      fill: false,
-      tension: 0.4
-    }));
  
   const studentsWithMultipleSessions = phqData.filter(user => user.count > 1)
         .map((item: { name: string}) => ({
@@ -327,7 +316,7 @@ const AnalyticsPage = () => {
                     onChange={handleUserChange}
                   >
                     <option value="" disabled>
-                      Choose Student
+                      Options...
                     </option>
                     {Array.from(
                       new Map(phqData.map((user) => [user.name, user])).values()
@@ -345,18 +334,39 @@ const AnalyticsPage = () => {
             </div>
 
             <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
-              {/* Line Chart */}
               <div className="flex-1 min-w-[45%]">
                 <h2 className="text-lg font-semibold text-darkest mb-3">Emotional Comparison</h2>
-                <Line data={{
-                    labels: phqData.map((val, index) => "#" + index),
-                    datasets: phq9DataChartDataForSchool
-                }} options={{ responsive: true }} />
+                <Bar
+                  data={phq9BarChartForSchool}
+                  options={{
+                    indexAxis: 'x',
+                    responsive: true,
+                    scales: {
+                      x: {
+                        min: 0,
+                        max: 11,
+                        ticks: {
+                          stepSize: 1,
+                        },
+                      },
+                      y: {
+                        title: {
+                          display: true,
+                          text: 'PHQ9-BDI Scores',
+                        },
+                        min: 0,
+                        ticks: {
+                          stepSize: 1,
+                        },
+                      },
+                    },
+                  }}
+                />
               </div>
 
               {/* Bar Chart */}
               <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">PHQ9 Distribution By Gender</h2>
+                <h2 className="text-lg font-semibold text-darkest mb-3">PHQ9-BDI Distribution By Gender</h2>
                 <Bar
                   data={phq9BarChartByGender}
                   options={{
@@ -390,46 +400,6 @@ const AnalyticsPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
-              {/* Line Chart */}
-              <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">Emotional Comparison</h2>
-                <Line data={{
-                    labels: phqData.map((val, index) => "#" + index),
-                    datasets: phq9DataChartDataForSchool
-                }} options={{ responsive: true }} />
-              </div>
-              {/* Line Chart */}
-              <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">Emotional Categories Distribution</h2>
-                <Bar
-                  data={phq9BarChartForSchool}
-                  options={{
-                    indexAxis: 'x',
-                    responsive: true,
-                    scales: {
-                      x: {
-                        min: 0,
-                        max: 11,
-                        ticks: {
-                          stepSize: 1,
-                        },
-                      },
-                      y: {
-                        title: {
-                          display: true,
-                          text: 'PHQ-9 Scores',
-                        },
-                        min: 0,
-                        ticks: {
-                          stepSize: 1,
-                        },
-                      },
-                    },
-                  }}
-                />
-              </div>
-            </div>
 
             <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
               {/* Line Chart */}
@@ -457,7 +427,7 @@ const AnalyticsPage = () => {
                       y: {
                           title: {
                               display: true,
-                              text: 'PHQ-9 Score' // Text for the y-axis
+                              text: 'PHQ9-BDI Scores' // Text for the y-axis
                           },
                           min: 0, 
                           max: 40 // Adjust according to expected PHQ-9 score range
@@ -468,7 +438,7 @@ const AnalyticsPage = () => {
 
               {/* Bar Chart */}
               <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">PHQ9 Distribution By Grades</h2>
+                <h2 className="text-lg font-semibold text-darkest mb-3">PHQ9-BDI Distribution By Grades</h2>
                 <Bar
                   data={phq9BarChartByGrade}
                   options={{
@@ -478,7 +448,7 @@ const AnalyticsPage = () => {
                       x: {
                         title: {
                           display: true,
-                          text: 'PHQ-9 Bands',
+                          text: 'PHQ9-BDI Bands',
                         },
                         min: 0,
                         max: 11,
@@ -489,7 +459,7 @@ const AnalyticsPage = () => {
                       y: {
                         title: {
                           display: true,
-                          text: 'Average Score',
+                          text: 'Average Scores',
                         },
                         min: 0,
                         ticks: {
