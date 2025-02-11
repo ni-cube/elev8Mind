@@ -6,7 +6,7 @@ class FileConfig implements IDbConfig {
   private data: typeof userSessions;
   private filePath: string;
   
-  constructor(filePath: string = "/Users/spalrccl.com/git/mental-health-chatbot/src/data/store.ts") {
+  constructor(filePath: string = "/Users/spalrccl.com/git/elev8Mind/src/data/store.ts") {
     this.filePath = filePath;
     this.data = [...userSessions]; // Initialize with synthetic user sessions
   }

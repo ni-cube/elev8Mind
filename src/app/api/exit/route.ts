@@ -1,11 +1,8 @@
-import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { systemMessage } from "./_constants";
-import { readChatResponse } from "@/utils/util";
 import FileConfig from "@/lib/config/FileConfig";
 import { Profile } from "@/types/profile";
-import { llm } from "../_constants";
+import { fetchAndTextResponse } from "../util";
 
 export async function POST(req: NextRequest) {
   const body = await req.json(); // Parse the JSON once
@@ -21,12 +18,7 @@ export async function POST(req: NextRequest) {
           .replaceAll("{{response}}", userMsg)
         };
 
-  const result = await streamText({
-    model: openai(llm),
-    messages: [systemMsg],
-  });
-  const streamResponse = await result.toDataStreamResponse();
-  const parsedText = await readChatResponse(streamResponse.body?.getReader()); 
+  const parsedText = await fetchAndTextResponse([systemMsg]);
 
   const parsedResponse = JSON.parse(parsedText);
   parsedResponse.message = userMsg;
@@ -36,6 +28,5 @@ export async function POST(req: NextRequest) {
   // Format - "{\"phq9_score\":\"15\",\"bdi_score\":\"24\",\"message\":\"I am sad\"}"
   store.set(scoreKey, JSON.stringify(parsedResponse));
   //console.log("DD - " + JSON.stringify(parsedResponse));
-  return result.toDataStreamResponse();
-
+  return NextResponse.json({ "status": "success" });
 }

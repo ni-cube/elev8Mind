@@ -81,7 +81,7 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
 
   const fetchSeverity = async (data: Message[]) => {
     try {
-      const response = await fetch("/api/emotional-severity", {
+      const response = await fetch("https://elev8-ml-pi.vercel.app/api/bayes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

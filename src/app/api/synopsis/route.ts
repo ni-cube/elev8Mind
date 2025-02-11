@@ -1,9 +1,7 @@
-import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
 import { schoolMessage, userMessage } from "./_constants";
 import { userSessions } from '@/data/store';
 import { NextRequest } from "next/server";
-import { llm } from "../_constants";
+import { fetchAndStreamResponse } from "../util";
 
 export async function POST(req: NextRequest) {
   const body = await req.json(); // Parse the JSON once
@@ -42,10 +40,6 @@ export async function POST(req: NextRequest) {
             .replaceAll("{{messages}}", messages)
     };
   }
-  const result = await streamText({
-    model: openai(llm),
-    messages: [systemMsg],
-  });
-  return result.toDataStreamResponse();
 
+  return fetchAndStreamResponse([systemMsg]);
 }

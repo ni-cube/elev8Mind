@@ -376,23 +376,5 @@ export const userSessions = [
       "gender": "Male",
       "grade": "9"
     }
-  },
-  {
-    "user": "scores:sanjib:1/28/2025, 3:28:42 PM",
-    "scores": {
-      "phq9_score": "15",
-      "bdi_score": "24",
-      "phq9_categories": {
-        "confused": "2",
-        "hopelessness": "3",
-        "exhausted": "4",
-        "disconnected": "2",
-        "angry": "2",
-        "despair": "2"
-      },
-      "message": "Hi sanjib! It sounds like you're feeling really down. How can I support you right now? | i am done | 🆘 Important Support Resources:/n/n\n      \n      • Crisis Helpline: Available 24/7 - Call or Text 988/n\n      • Teen Crisis Text Line: Text HOME to 741741/n\n      • Emergency: Call 911/n/n\n      \n      Remember: You're not alone. Reaching out is a sign of strength! 💪 | i quit | I'm here for you, and I appreciate you sharing your feelings. Remember, it's okay to seek help when you need it. You're not alone in this. | ok | If you ever feel ready to talk more or need support, I'm here for you. Take care of yourself, and remember that your feelings are valid. You're not alone. | lets kill everybody | It's concerning to hear you express such intense feelings. If you're feeling overwhelmed or in crisis, please reach out to a mental health professional or a crisis helpline for support. Your well-being is important, and there are people who can help you through this. You're not alone in this.🆘 Important Support Resources:/n/n\n      \n      • Crisis Helpline: Available 24/7 - Call or Text 988/n\n      • Teen Crisis Text Line: Text HOME to 741741/n\n      • Emergency: Call 911/n/n\n      \n      Remember: You're not alone. Reaching out is a sign of strength! 💪",
-      "gender": "Female",
-      "grade": "12"
-    }
   }
 ];
