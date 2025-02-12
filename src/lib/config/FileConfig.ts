@@ -1,12 +1,14 @@
 import { userSessions } from "@/data/store";
 import { IDbConfig } from "./IDbConfig";
+
 import fs from "fs";
+import path from 'path';
 
 class FileConfig implements IDbConfig {
   private data: typeof userSessions;
   private filePath: string;
   
-  constructor(filePath: string = "/Users/spalrccl.com/git/elev8Mind/src/data/store.ts") {
+  constructor(filePath: string = path.join(__dirname,"../../../../../src/data/store.ts")) {
     this.filePath = filePath;
     this.data = [...userSessions]; // Initialize with synthetic user sessions
   }
