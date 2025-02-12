@@ -15,7 +15,7 @@ const Login: React.FC = () => {
   const [grade, setGrade] = useState<string>(""); // State for grade dropdown
   const { getAllEmotions } = useEmotion();
   const [password, setPassword] = useState<string>(""); // For password
-  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]); // State for multiple emoji selections
+  const [selectedEmotions, setSelectedEmotions] = useState<string[]>(["anger"]); // State for multiple emoji selections
   
   const router = useRouter(); // To navigate to another page after login
 
