@@ -10,7 +10,6 @@ const Login: React.FC = () => {
   // State for managing username, password, and error messages
   const [username, setUsername] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [isAnonymous, setIsAnonymous] = useState(false);
   const [gender, setGender] = useState<string>(""); // State for gender dropdown
   const [grade, setGrade] = useState<string>(""); // State for grade dropdown
   const { getAllEmotions } = useEmotion();
@@ -21,20 +20,20 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     const profile: Profile = {
-      username: isAnonymous ? 'Anonymous' : username, 
+      username: username, 
       gender, 
       grade, 
       emotKey: selectedEmotions[0]
     };
     localStorage.setItem('profile', JSON.stringify(profile));
-  }, [username, isAnonymous, gender, grade, selectedEmotions]);
+  }, [username, gender, grade, selectedEmotions]);
 
   // Handle the form submission
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     // Check if the username is empty for anonymous users or required for authenticated users
-    if (!username && !isAnonymous) {
+    if (!username) {
       setErrorMessage("Please fill out your user name.");
     } else if (username === "Nirajeet" && !password) {
       setErrorMessage("Please enter your password.");
@@ -145,18 +144,6 @@ const Login: React.FC = () => {
           </>
         )}
         {/* Anonymous checkbox below the username and password */}
-        <div className="flex items-center mb-6">
-          <input
-            type="checkbox"
-            id="anonymous"
-            className="mr-2"
-            checked={isAnonymous}
-            onChange={() => setIsAnonymous(!isAnonymous)}
-          />
-          <label htmlFor="anonymous" className="text-sm font-medium text-[#407786]">
-            Log in as anonymous
-          </label>
-        </div>
         <div className="mt-6 flex gap-3 flex-wrap justify-center mb-4">
           {getAllEmotions().map((emotion, emoji) => (
             <button
