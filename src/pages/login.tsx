@@ -4,6 +4,7 @@ import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useRouter } from 'next/navigation'; // Use Next.js router
 import { useEmotion } from "@/hooks/useEmotion";
 import { Profile } from "@/types/profile";
+import Image from "next/image";
 
 
 const Login: React.FC = () => {
@@ -65,16 +66,19 @@ const Login: React.FC = () => {
 
   return (
   <Layout>
-    <div className="flex justify-center items-center min-h-screen bg-[#72bbce] p-4">
-      <div className="bg-white p-4 rounded-xl shadow-lg w-full max-w-md">
-        <h2 className="text-[#407786] text-2xl font-semibold text-center mb-6">
-          Elev8 Mind 💙
-        </h2>
+    <div className="flex justify-center items-center min-h-screen bg-[#72bbce] p-4 relative flex-col">
+      <div className="sky top-0 left-200 w-full h-full z-0"></div>
+      <div className="bg-white p-4 rounded-xl shadow-lg w-full max-w-md z-20 relative">
+        <div className="flex justify-center items-center mb-6">
+          <h2 className="text-darkest text-5xl font-bold text-center">Elev</h2>
+          <Image src="/logo-white.png" alt="Elev8Mind Logo" className="w-12 h-12 mr-2" />
+          <h2 className="text-darkest text-5xl font-bold text-center">Mind</h2>
+        </div>
 
         <form onSubmit={handleSubmit}>
         <div className="flex space-x-4 mb-4">
           <div className="flex-1">
-            <label htmlFor="username" className="block text-[#2c5561] text-sm mb-2">
+            <label htmlFor="username" className="block text-[#2c5561] text-md mb-2">
               Username
             </label>
             <input
@@ -83,7 +87,7 @@ const Login: React.FC = () => {
               value={username}
               onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
               placeholder="Enter your username"
-              className="w-full p-3 border rounded-lg bg-[#e8f4f7] focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
+              className="w-full p-3 border rounded-lg bg-[#e8f4f7] focus:outline-none focus:ring-2 border-[#5999ab]"
             />
           </div>
         </div>
@@ -92,7 +96,7 @@ const Login: React.FC = () => {
         {username === "Nirajeet" && (
           <div className="flex space-x-4 mb-4">
             <div className="flex-1">
-              <label htmlFor="password" className="block text-[#2c5561] text-sm mb-2">
+              <label htmlFor="password" className="block text-[#2c5561] text-md mb-2">
                 Password
               </label>
               <input
@@ -101,7 +105,7 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full p-3 border rounded-lg bg-[#e8f4f7] focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
+                className="w-full p-3 border rounded-lg bg-[#e8f4f7] focus:outline-none focus:ring-2 border-[#5999ab]"
               />
             </div>
           </div>
@@ -109,14 +113,14 @@ const Login: React.FC = () => {
         {username != "Nirajeet" && (
           <>
             <div className="mb-4">
-              <label htmlFor="gender" className="block text-[#2c5561] text-sm mb-2">
+              <label htmlFor="gender" className="block text-[#2c5561] text-md mb-2">
                 Gender
               </label>
               <select
                 id="gender"
                 value={gender}
                 onChange={(e: ChangeEvent<HTMLSelectElement>) => setGender(e.target.value)}
-                className="w-full p-3 border rounded-lg bg-[#e8f4f7] text-text focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
+                className="w-full p-3 border rounded-lg bg-[#e8f4f7] text-text focus:outline-none focus:ring-2 border-[#5999ab]"
               >
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
@@ -125,14 +129,14 @@ const Login: React.FC = () => {
             </div>
 
             <div className="mb-4">
-              <label htmlFor="grade" className="block text-text text-sm mb-2">
+              <label htmlFor="grade" className="block text-text text-md mb-2">
                 Grade
               </label>
               <select
                 id="grade"
                 value={grade}
                 onChange={(e: ChangeEvent<HTMLSelectElement>) => setGrade(e.target.value)}
-                className="w-full p-3 border rounded-lg bg-[#e8f4f7] text-[#2c4441] focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
+                className="w-full p-3 border rounded-lg bg-[#e8f4f7] text-[#2c4441] focus:outline-none focus:ring-2 border-[#5999ab]"
               >
                 <option value="">Select Grade</option>
                 <option value="9">9</option>
@@ -149,7 +153,7 @@ const Login: React.FC = () => {
             <button
               key={emoji}
               onClick={(e) => handleClick(e, emotion.emotion as "joy" | "sadness" | "anxiety" | "anger" | "sleepy" | "upset")}
-              className={`flex flex-col items-center p-2 border-none rounded-lg cursor-pointer
+              className={`flex flex-col items-center p-2 border-1 rounded-lg cursor-pointer
                     ${selectedEmotions.includes(emotion.emotion) ? 'bg-[#4db8ff] border-2 border-[#1d8fbc]' : 'bg-lighter'}
                     hover:bg-[#ffde59] focus:ring-2 focus:ring-[#5999ab]`}
             >
@@ -169,7 +173,21 @@ const Login: React.FC = () => {
           </button>
         </form>
       </div>
+
+      <div className="grid grid-cols-3 gap-4 mt-8 md:mt-16 md:grid-cols-4">
+        {[
+          { text: "Mobile Friendly", color: "bg-[#ff6b6b]" },
+          { text: "Available 24/7", color: "bg-[#ffa502]" },
+          { text: "Cheaper", color: "bg-[#2ed573]" },
+          { text: "More Outreach", color: "bg-[#1e90ff]" }
+        ].map((feature, index) => (
+          <div key={index} className={`${feature.color} text-md md:text-lg text-white px-6 py-4 rounded-full shadow-md flex items-center justify-center w-24 h-24 text-center font-bold md:w-32 md:h-32`}>
+            {feature.text}
+          </div>
+        ))}
+      </div>
     </div>
+
   </Layout> 
   );
 };

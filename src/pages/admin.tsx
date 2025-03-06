@@ -37,9 +37,9 @@ const AnalyticsPage = () => {
       console.warn('No user sessions available');
       return [];
     }
-
+  
     // Aggregate data to ensure uniqueness and compute averages
-    const userMap = userSessions.reduce((acc: Record<string, PHQData>, session: { user: string; scores: { phq9_score: string; bdi_score: string; phq9_categories: Record<string, string>; gender: string; grade: string; }; }) => {
+    const userMap = userSessions.reduce((acc: Record<string, PHQData>, session) => {
       const name = session.user.split(':')[1];
       const phqScore = parseInt(session.scores.phq9_score, 10);
       const bdiScore = parseInt(session.scores.bdi_score, 10);
@@ -54,8 +54,8 @@ const AnalyticsPage = () => {
           bdiScore: 0,
           count: 0,
           phq9Categories: {},
-          gender,
-          grade,
+          gender: gender || '',
+          grade: grade || '',
         };
       }
   
@@ -73,7 +73,7 @@ const AnalyticsPage = () => {
       }
   
       return acc;
-    }, {});
+    }, {} as Record<string, PHQData>);
   
     // Calculate the averages for phqScore, bdiScore, and phq9Categories
     return Object.values(userMap).map(user => ({
@@ -100,8 +100,8 @@ const AnalyticsPage = () => {
         phqScore: parseInt(session.scores.phq9_score, 10),
         bdiScore: parseInt(session.scores.bdi_score, 10),
         phq9Categories: session.scores.phq9_categories,
-        gender: session.scores.gender,
-        grade: session.scores.grade,
+        gender: session.scores.gender || '',
+        grade: session.scores.grade || '',
         count: 1,
       }));
     return data;
@@ -189,9 +189,6 @@ const AnalyticsPage = () => {
           fill: false,
           tension: 0.4
   }));
-  
-
-
 
 
   const driftData = {
@@ -199,9 +196,6 @@ const AnalyticsPage = () => {
     datasets: studentsWithMultipleSessions
   };
 
-
-  const phq9BarChartDataByGender = generatePHQ9BarChartData(['Male', 'Female'], (user, gender) => user.gender===gender);
-  const phq9BarChartDataByGrade = generatePHQ9BarChartData(['9', '10', '11', '12'], (user, grade) => user.grade===grade);
   const phq9BarChartDataForSchool = generatePHQ9BarChartData(['1'], () => true);
   const phq9BarChartForSchool = {
     labels: ['Confusion', 'Agressive Behaviors', 'Hopelessness', 'Anhedonia (Loss of Interest)', 'Fatigue and Sleep Disturbances'],
@@ -209,27 +203,72 @@ const AnalyticsPage = () => {
       {
         label: 'Emotional Categrories',
         data: phq9BarChartDataForSchool['1'],
-        backgroundColor: 'rgba(89, 153, 171, 0.7)',
-        borderColor: '#5999ab',
+        backgroundColor: 'rgba(8, 54, 67, 1)',
+        borderColor: '#rgba(8, 54, 67, 0.7)',
         borderWidth: 1
       }
     ]
   };
+
+
+
+
+  const generatePHQ9StackedBarChartData = () => {
+    const phq9BarChartData: { [key: string]: { total: number; boys: number; girls: number }[] } = {};
+    const grades: string[] = ['9', '10', '11', '12'];
+
+    grades.forEach(grade => {
+      const users = phqData.filter(user => user.grade===grade);
+      const boys = users.filter(user => user.gender=="Male");
+      const girls = users.filter(user => user.gender=="Female");
+      phq9BarChartData[`${grade}`] = [
+        {
+          total: users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.confused || 0), 10), 0)/users.length,
+          boys: boys.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.confused || 0), 10), 0)/users.length,
+          girls: girls.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.confused || 0), 10), 0)/users.length
+        },
+        {
+          total: users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.angry || 0), 10), 0)/users.length,
+          boys: boys.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.angry || 0), 10), 0)/users.length,
+          girls: girls.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.angry || 0), 10), 0)/users.length
+        },
+        {
+          total: users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.despair || 0), 10) + parseInt(String(user.phq9Categories.hopelessness || 0), 10), 0)/users.length,
+          boys: boys.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.despair || 0), 10) + parseInt(String(user.phq9Categories.hopelessness || 0), 10), 0)/users.length,
+          girls: girls.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.despair || 0), 10) + parseInt(String(user.phq9Categories.hopelessness || 0), 10), 0)/users.length
+        },
+        {
+          total: users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.disconnected || 0), 10), 0)/users.length,
+          boys: boys.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.disconnected || 0), 10), 0)/users.length,
+          girls: girls.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.disconnected || 0), 10), 0)/users.length
+        },
+        {
+          total: users.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.exhausted || 0), 10), 0)/users.length,
+          boys: boys.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.exhausted || 0), 10), 0)/users.length,
+          girls: girls.reduce((acc, user) => acc + parseInt(String(user.phq9Categories.exhausted || 0), 10), 0)/users.length
+        }
+      ];
+    });
+    return phq9BarChartData;
+  };
+
   const phq9BarChartByGender = {
     labels: ['Confusion', 'Agressive Behaviors', 'Hopelessness', 'Anhedonia (Loss of Interest)', 'Fatigue and Sleep Disturbances'],
     datasets: [
       {
         label: 'Boys',
-        data: phq9BarChartDataByGender['Male'],
-        backgroundColor: 'rgba(89, 153, 171, 0.7)',
-        borderColor: '#5999ab',
+        data: generatePHQ9StackedBarChartData()['9'].map((entry, index) => entry.boys + generatePHQ9StackedBarChartData()['10'][index].boys 
+          + generatePHQ9StackedBarChartData()['11'][index].boys + generatePHQ9StackedBarChartData()['12'][index].boys),
+        backgroundColor: '#rgba(8, 54, 67, 0.7)',
+        borderColor: '#rgba(8, 54, 67, 1)',
         borderWidth: 1
       },
       {
         label: 'Girls',
-        data: phq9BarChartDataByGender['Female'],
-        backgroundColor: 'rgba(171, 89, 89, 0.3)',
-        borderColor: '#ab5959',
+        data: generatePHQ9StackedBarChartData()['9'].map((entry, index) => entry.girls + generatePHQ9StackedBarChartData()['10'][index].girls 
+          + generatePHQ9StackedBarChartData()['11'][index].girls + generatePHQ9StackedBarChartData()['12'][index].girls),
+        backgroundColor: 'rgba(171, 89, 130, 1)',
+        borderColor: 'rgba(171, 89, 130, 0.7)',
         borderWidth: 1
       }         
     ]
@@ -240,28 +279,28 @@ const AnalyticsPage = () => {
     datasets: [
       {
         label: '9',
-        data: phq9BarChartDataByGrade['9'],
-        backgroundColor: 'rgba(15, 103, 128, 0.7)',
+        data: generatePHQ9StackedBarChartData()['9'].map((entry) => entry.total),
+        backgroundColor: 'rgba(8, 54, 67, 1)',
         borderColor: '#2c5f66',
         borderWidth: 1
       },
       {
         label: '10',
-        data: phq9BarChartDataByGrade['10'],
+        data: generatePHQ9StackedBarChartData()['10'].map((entry) => entry.total),
         backgroundColor: 'rgba(195, 201, 130, 0.7)',
         borderColor: '#1f4d57',
         borderWidth: 1
       },
       {
         label: '11',
-        data: phq9BarChartDataByGrade['11'],
-        backgroundColor: 'rgba(171, 89, 130, 0.7)',
+        data: generatePHQ9StackedBarChartData()['11'].map((entry) => entry.total),
+        backgroundColor: 'rgba(171, 89, 130, 1)',
         borderColor: '#17434a',
         borderWidth: 1
       },
       {
         label: '12',
-        data: phq9BarChartDataByGrade['12'],
+        data: generatePHQ9StackedBarChartData()['12'].map((entry) => entry.total),
         backgroundColor: 'rgba(54, 34, 166, 0.7)',
         borderColor: '#0d3840',
         borderWidth: 1
@@ -278,6 +317,66 @@ const AnalyticsPage = () => {
     link.click();
   };
 
+
+  // Example processed data
+const rawData = {
+  labels: ['Confusion', 'Agressive Behaviors', 'Hopelessness', 'Anhedonia (Loss of Interest)', 'Fatigue and Sleep Disturbances'],
+  datasets: [
+    {
+      label: "9",
+      data: generatePHQ9StackedBarChartData()['9']
+    },
+    {
+      label: "10",
+      data: generatePHQ9StackedBarChartData()['10']
+    },
+    {
+      label: "11",
+      data: generatePHQ9StackedBarChartData()['11']
+    },
+    {
+      label: "12",
+      data: generatePHQ9StackedBarChartData()['12']
+    },    
+  ],
+};
+
+const labels = rawData.labels; // PHQ9 categories for X-axis
+
+const datasets: Array<{
+  label: string;
+  data: number[];
+  backgroundColor: string;
+  borderColor: string;
+  borderWidth: number;
+  stack: string;
+}> = [];
+
+rawData.datasets.forEach((grade) => {
+  datasets.push({
+    label: `${grade.label} - Boys`,
+    data: grade.data.map((entry) => entry.boys),
+    backgroundColor: 'rgba(8, 54, 67, 1)', // Blue for Boys
+    borderColor: "rgba(8, 54, 67, 0.7)",
+    borderWidth: 1,
+    stack: grade.label, // Ensures boys & girls are stacked within the same grade
+  });
+
+  datasets.push({
+    label: `${grade.label} - Girls`,
+    data: grade.data.map((entry) => entry.girls),
+    backgroundColor: "rgba(171, 89, 130, 1)", // Pink for Girls
+    borderColor: "rgba(171, 89, 130, 0.7)",
+    borderWidth: 1,
+    stack: grade.label, // Ensures boys & girls are stacked within the same grade
+  });
+});
+
+const stackedChartData = {
+  labels,
+  datasets,
+};
+
   return (
     <Layout>
       <div className="flex flex-col h-screen bg-primary p-5">
@@ -286,32 +385,32 @@ const AnalyticsPage = () => {
           <div className="flex-1 bg-lightest rounded-lg p-5 overflow-y-auto mb-5" style={{ height: '100%' }}>
             <div className="bg-lightest rounded-lg p-5 shadow-md mb-6 flex gap-6">
               <div className="w-1/3">
-                <h2 className="text-lg font-semibold text-darkest mb-3">Overview</h2>
+                <h2 className="text-lg font-bold text-darkest mb-3">Overview</h2>
                 <div className="flex flex-col gap-4">
                   <div>
-                    <h3 className="text-md text-text">Total Users</h3>
-                    <p className="text-xl font-semibold text-darkest">{totalUsers}</p>
+                    <h3 className="text-md text-darkest">Total Users</h3>
+                    <p className="text-xl font-bold text-darkest">{totalUsers}</p>
                   </div>
                   <div>
-                    <h3 className="text-md text-text">Average PHQ-9 Score</h3>
-                    <p className="text-xl font-semibold text-darkest">{averagePHQScore}</p>
+                    <h3 className="text-md text-darkest">Average PHQ-9 Score</h3>
+                    <p className="text-xl font-bold text-darkest">{averagePHQScore}</p>
                   </div>
                   <div>
-                    <h3 className="text-md text-text">Average BDI Score</h3>
-                    <p className="text-xl font-semibold text-darkest">{averageBDIScore}</p>
+                    <h3 className="text-md text-darkest">Average BDI Score</h3>
+                    <p className="text-xl font-bold text-darkest">{averageBDIScore}</p>
                   </div>
                 </div>
               </div>
 
               <div className="w-2/3">
-                <h2 className="text-lg font-semibold text-darkest mb-3">Synopsis</h2>
-                <p className="text-text">
+                <h2 className="text-lg font-bold text-darkest mb-3">Synopsis</h2>
+                <p className="text-darkest">
                   {synopsis}
                 </p>
                 <div className="mt-4">
                   <select
                     id="userDropdown"
-                    className="px-4 py-2 border rounded-lg bg-lighter text-text focus:ring-2 focus:ring-[#5999ab]"
+                    className="px-4 py-2 border rounded-lg bg-lighter text-darkest focus:ring-2 focus:ring-[#5999ab]"
                     value={selectedUser}
                     onChange={handleUserChange}
                   >
@@ -326,16 +425,16 @@ const AnalyticsPage = () => {
                       </option>
                     ))}
                   </select>
-                  <p className="text-text">
+                  <p className="text-darkest">
                     {userSynopsis}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
-              <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">Emotional Comparison</h2>
+            <div className="flex flex-wrap justify-between gap-4 rounded-lg p-5 shadow-md mb-5">
+              <div className="flex-1 bg-white min-w-[45%]">
+                <h2 className="text-lg font-bold bg-lightest text-darkest mb-3">Emotional Comparison</h2>
                 <Bar
                   data={phq9BarChartForSchool}
                   options={{
@@ -346,7 +445,10 @@ const AnalyticsPage = () => {
                         min: 0,
                         max: 11,
                         ticks: {
-                          stepSize: 1,
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
                         },
                       },
                       y: {
@@ -356,7 +458,10 @@ const AnalyticsPage = () => {
                         },
                         min: 0,
                         ticks: {
-                          stepSize: 1,
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
                         },
                       },
                     },
@@ -364,47 +469,10 @@ const AnalyticsPage = () => {
                 />
               </div>
 
-              {/* Bar Chart */}
-              <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">PHQ9-BDI Distribution By Gender</h2>
-                <Bar
-                  data={phq9BarChartByGender}
-                  options={{
-                    indexAxis: 'x',
-                    responsive: true,
-                    scales: {
-                      x: {
-                        title: {
-                          display: true,
-                          text: 'PHQ-9 Bands',
-                        },
-                        min: 0,
-                        max: 11,
-                        ticks: {
-                          stepSize: 1,
-                        },
-                      },
-                      y: {
-                        title: {
-                          display: true,
-                          text: 'Average Score',
-                        },
-                        min: 0,
-                        ticks: {
-                          stepSize: 1,
-                        },
-                      },
-                    },
-                  }}
-                />
-              </div>
-            </div>
 
-
-            <div className="flex flex-wrap justify-between gap-4 bg-lightest rounded-lg p-5 shadow-md mb-5">
               {/* Line Chart */}
-              <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">Linguistic Drift</h2>
+              <div className="flex-1 bg-white min-w-[45%]">
+                <h2 className="text-lg bg-lightest font-bold text-darkest mb-3">Linguistic Drift</h2>
                 <Line data={driftData} options={{ 
                   responsive: true,
                   plugins: {
@@ -435,10 +503,54 @@ const AnalyticsPage = () => {
                   }
                  }} />
               </div>
+            </div>
+
+
+            <div className="flex flex-wrap justify-between gap-4 rounded-lg p-5 shadow-md mb-5">
+              {/* Bar Chart */}
+              <div className="flex-1 bg-white min-w-[45%]">
+                <h2 className="text-lg bg-lightest font-bold text-darkest mb-3">PHQ9-BDI Distribution By Gender</h2>
+                <Bar
+                  data={phq9BarChartByGender}
+                  options={{
+                    indexAxis: 'x',
+                    responsive: true,
+                    scales: {
+                      x: {
+                        title: {
+                          display: true,
+                          text: 'PHQ-9 Bands',
+                        },
+                        min: 0,
+                        max: 11,
+                        ticks: {
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
+                        },
+                      },
+                      y: {
+                        title: {
+                          display: true,
+                          text: 'Average Score',
+                        },
+                        min: 0,
+                        ticks: {
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
 
               {/* Bar Chart */}
-              <div className="flex-1 min-w-[45%]">
-                <h2 className="text-lg font-semibold text-darkest mb-3">PHQ9-BDI Distribution By Grades</h2>
+              <div className="flex-1 bg-white min-w-[45%]">
+                <h2 className="text-lg font-bold bg-lightest text-darkest mb-3">PHQ9-BDI Distribution By Grades</h2>
                 <Bar
                   data={phq9BarChartByGrade}
                   options={{
@@ -453,7 +565,10 @@ const AnalyticsPage = () => {
                         min: 0,
                         max: 11,
                         ticks: {
-                          stepSize: 1,
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
                         },
                       },
                       y: {
@@ -463,7 +578,10 @@ const AnalyticsPage = () => {
                         },
                         min: 0,
                         ticks: {
-                          stepSize: 1,
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
                         },
                       },
                     },
@@ -474,9 +592,58 @@ const AnalyticsPage = () => {
 
 
 
+            <div className="flex flex-wrap justify-between gap-4 rounded-lg p-5 shadow-md mb-5">
+    
+              
+              {/* Bar Chart */}
+              <div className="flex-1 bg-white min-w-[100%]">
+                <h2 className="text-lg font-bold bg-lightest text-darkest mb-3">PHQ9-BDI Distribution By Grades & Gender</h2>
+                <Bar
+                  data={stackedChartData}
+                  options={{
+                    responsive: true,
+                    scales: {
+                      x: {
+                        stacked: false, // Ensures Grade 9 & Grade 10 bars are side-by-side
+                        title: {
+                          display: true,
+                          text: "PHQ9-BDI Categories",
+                        },
+                        ticks: {
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
+                        },
+                      },
+                      y: {
+                        stacked: true, // Ensures Boys & Girls are stacked within each Grade bar
+                        title: {
+                          display: true,
+                          text: "Average Score",
+                        },
+                        ticks: {
+                          color: "#000", // Darker tick labels
+                          font: {
+                            size: 12,
+                          },
+                        },
+                      },
+                    },
+                    plugins: {
+                      legend: {
+                        position: "top",
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </div>
+
+
             <div className="bg-lightest rounded-lg p-5 shadow-md">
-              <h2 className="text-lg font-semibold text-darkest mb-3">Details</h2>
-              <p className="text-text">
+              <h2 className="text-lg font-bold text-darkest mb-3">Details</h2>
+              <p className="text-darkest">
                 This page shows the PHQ-9 and BDI ratings for all users. Use the graph above to see the trends in mood ratings.
                 You can also export this data for further analysis by clicking the Export Data button.
               </p>
@@ -484,7 +651,7 @@ const AnalyticsPage = () => {
             <div className="flex justify-end mt-5">
               <button
                 onClick={handleExport}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                className="px-4 py-2 bg-darker text-white rounded-lg"
               >
                 Export Data
               </button>

@@ -3,6 +3,7 @@ import { getCategoryOf2ndLastSymptomsCovered, getSymptomfromEmotionId, getKeywor
 import { helpMessage } from "../utils/genericMessage";
 import { readChatResponse } from "@/utils/util";
 import { emotionEmojis, commonEmojis } from "@/utils/emotions";
+import { GameState } from "@/types/gameState";
 
 interface Message {
   id: number;
@@ -18,7 +19,7 @@ interface SymptomSelection {
   symptomCovered:string, 
   keywords: string[],
 }
-export default function ChatPrompt({ messages, setMessages }: { messages: Message[], setMessages: React.Dispatch<React.SetStateAction<Message[]>> }) {
+export default function ChatPrompt({ messages, setMessages, setGameState }: { messages: Message[], setMessages: React.Dispatch<React.SetStateAction<Message[]>>, setGameState: React.Dispatch<React.SetStateAction<GameState>> }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [ emoji, setEmoji ] = useState("");
   const [isMute, setIsMute] = useState(true);
@@ -112,7 +113,13 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
     };
     setMessages((prev: Message[]) => [...prev, userMessage]);
     setInputText("");
-    
+
+    if(chatState.symptomsCovered.length%2==0) {
+        setGameState((prev) => ({
+            ...prev,
+            level: Math.min(prev.level + 1, 11),
+        }));
+    }
     try {
       setGeneratingText(true);
       console.log("Ni3 Input - " + JSON.stringify(chatState));
@@ -189,26 +196,26 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 p-3 rounded-lg border border-lighter bg-lightest outline-none text-text"
+              className="flex-1 p-1 rounded-lg border-1 border-darkest bg-lightest outline-none text-text"
               placeholder={generatingText? "Processing...":"Type your message... 💭"}
             />
             <button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="p-3 bg-lighter border-none rounded-lg cursor-pointer text-xl"
+              className="p-2 bg-lighter border-2 border-darkest rounded-lg cursor-pointer"
             >
               {emoji}
             </button>
             <button
               type="submit"
-              className="p-3 px-6 bg-darkest text-white border-none rounded-lg cursor-pointer"
+              className="p-2 bg-darkest text-white sm:text-sm rounded-lg font-bold cursor-pointer"
             >
               Send 💙
             </button>
             <button
               type="button"
               onClick={() => setIsMute(!isMute)}
-              className="p-3 bg-lighter border-none rounded-lg cursor-pointer text-xl"
+              className="p-2 bg-lighter border-2 border-darkest rounded-lg cursor-pointer text-xl"
             >
               {isMute ? "🔇" : "🔊"}
             </button>
@@ -221,7 +228,7 @@ export default function ChatPrompt({ messages, setMessages }: { messages: Messag
                   <button
                     key={index}
                     onClick={() => handleEmojiClick(emoji)}
-                    className="text-xl p-2 border-none bg-transparent cursor-pointer rounded-sm"
+                    className="text-xl p-2 border-2 border-darkest bg-transparent cursor-pointer rounded-sm"
                   >
                     {emoji}
                   </button>
