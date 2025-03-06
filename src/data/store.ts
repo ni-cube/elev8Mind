@@ -374,7 +374,23 @@ export const userSessions = [
       },
       "message": "Hi satbik! You sound really drained. Is there something I can do to help lighten the load? | i am so sleepy | I'm sorry to hear that you're feeling so sleepy. It's tough to deal with that constant tiredness. Are you also finding it hard to keep up with daily tasks because of this? | yes i failed in my exams | I'm really sorry to hear that you're going through a tough time with your exams. It's completely normal to feel disappointed and overwhelmed when things don't go as planned. Remember, your worth is not defined by your exam results. It's okay to feel this way, and it's important to be kind to yourself during this time.nnAre you also experiencing difficulty sleeping or feeling restless due to the stress of failing your exams?",
       "gender": "Male",
-      "grade": "9"
+      "grade": "12"
+    }
+  },
+  {
+    "user": "scores:undefined:3/1/2025, 11:41:56 PM",
+    "scores": {
+      "phq9_score": "0",
+      "bdi_score": "0",
+      "phq9_categories": {
+        "confused": "0",
+        "hopelessness": "0",
+        "exhausted": "0",
+        "disconnected": "0",
+        "angry": "0",
+        "despair": "0"
+      },
+      "message": "Hey! 👋 Ready to explore your emotional world? You'll earn stars and unlock cool insights!"
     }
   }
 ];

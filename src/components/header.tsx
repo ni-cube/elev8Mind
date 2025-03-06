@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useRouter } from 'next/navigation'; // Use Next.js router
+import { usePathname } from 'next/navigation';
 import {
     Star,
     Trophy,
   } from "lucide-react";
+import Image from "next/image";
 interface Profile {
     username: string;
     grade: string;  
@@ -24,7 +25,8 @@ interface GameProps {
 
 export default function ChatHeader(gameState: GameProps) {
     const [showInfo, setShowInfo] = useState(false);
-    const router = useRouter();
+    const pathname = usePathname();
+    const buttonText = pathname?.includes('explorer') ? ' Quest' : ' Mood Explorer';
 
     const handleExit = async () => {
         try {
@@ -49,16 +51,29 @@ export default function ChatHeader(gameState: GameProps) {
         window.location.href = '/login';
     };
     const handleExplorer = async () => {
-        window.location.href = '/explorer';
+        if(location.pathname == '/explorer') {
+            window.location.href = '/dashboard';
+        } else {  
+            window.location.href = '/explorer';
+        }
     };
 
 
     return (
         <>
-        <div className="flex justify-between items-center mb-2">
-            <h1 className="text-darkest text-4xl font-bold m-0" onClick={handleLogin}>Elev8 Mind  <span style={{ animation: 'pumpHeart 1s infinite' }}>💙</span></h1>
+        
+        <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2" onClick={handleLogin}>
+                <Image 
+                    src="/logo.png" 
+                    alt="Elev8Mind Logo" 
+                    width={200} 
+                    height={50} 
+                    className="w-auto h-12 md:h-16 lg:h-20 max-w-full object-contain"
+                />
+            </div>
             {gameState.level!=0 && (
-            <div className="flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-6">
                 <div className="flex items-center space-x-2">
                     <Trophy className="w-6 h-6 fill-yellow-500" />
                     <span className="font-bold text-darkest">Level {gameState.level} / 11</span>
@@ -69,35 +84,26 @@ export default function ChatHeader(gameState: GameProps) {
                 </div>
             </div>
             )}
-            <div>
-            {gameState.level==0 && (
+            <div className="flex items-center space-x-2">
                 <button
                     onClick={handleExplorer}
-                    className="px-4 py-1 rounded-lg border-1 cursor-pointer ml-2 bg-lighter text-darkest shadow-lg"
+                    className="px-2 py-1 rounded-lg border-2 font-bold cursor-pointer ml-1 bg-lighter text-darkest border-darkest shadow-lg"
                 >
-                    📊 Mood Meter
+                    <span>📊</span> 
+                    <span className="hidden md:inline">{buttonText}</span>
                 </button>
-            )}
-            {gameState.level!=0 && (
-                <button
-                    onClick={() => router.replace('/dashboard')}
-                    className="px-4 py-1 rounded-lg border-1 cursor-pointer ml-2 bg-lighter text-darkest shadow-lg"
-                >
-                    📊 Quest
-                </button>
-            )}
 
                 <button
                     onClick={() => setShowInfo(!showInfo)}
-                    className="px-4 py-1 rounded-lg border-1 cursor-pointer ml-2 bg-lighter text-darkest shadow-lg"
+                    className="px-2 py-1 rounded-lg border-2 border-darkest cursor-pointer ml-1 bg-lighter text-darkest shadow-lg"
                 >
                     ℹ️
                 </button>
                 <button
                     onClick={handleExit}
-                    className="px-4 py-1 rounded-lg border-1 cursor-pointer ml-2 bg-lighter text-darkest shadow-lg"
+                    className="px-2 py-1 rounded-lg border-2 border-darkest cursor-pointer ml-1 bg-lighter text-darkest shadow-lg"
                 >
-                   🚪➡️ 
+                   ➡️ 
                 </button>
             </div>
         </div>

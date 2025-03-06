@@ -4,17 +4,8 @@ import { Button } from "@radix-ui/themes";
 import Layout from "@/layout";
 import clsx from "clsx";
 import ChatHeader from "@/components/header";
+import { GameState } from "@/types/gameState";
 
-// Define the state type for gameState
-interface GameState {
-  stars: number;
-  level: number;
-  currentIndex: number;
-  insights?: string[],
-  achievements?: string[],
-  streak?: number,
-  bdiScore?: number,
-}
 const questions = [
   {
     id: "mood",
@@ -62,7 +53,7 @@ const questions = [
         insight: "Optimistic outlook",
       },
       {
-        text: "Some uncertainty ahead 🤔",
+        text: "Some uncertainty 🤔",
         value: 1,
         stars: 8,
         achievement: "Path Finder",
@@ -625,24 +616,34 @@ export default function Explorer() {
                 >
                   <div
                     className={clsx(
-                      'max-w-[65%] rounded-lg shadow-lg',
-                      message.sender === 'user' ? 'p-2 bg-darkest text-white' : 'p-3 bg-lighter text-text'
+                      'max-w-[65%] rounded-lg border-2 border-darkest shadow-lg',
+                      message.sender === 'user' ? 'p-2 bg-darkest text-white' : 'p-3 bg-lighter text-darkest'
                     )}
                   >
                     {message.text.split('/n').map((line, idx) => (
-                      <p key={idx} className="m-0 mb-1">{line}</p>
+                      <p key={idx} className="m-0 mb-1 text-md">{line}</p>
                     ))}
                     {message.options && (
                       <div className="mt-2">
-                        {message.options.map((opt, idx) => (
-                          <Button
-                            key={idx}
-                            variant="outline"
-                            onClick={() => handleUserChoice(opt)}
-                            className="mr-2 mb-2 text-sm bg-darker text-white w-full hover:bg-darkest focus:ring-[#5999ab] focus:bg-darkest"
-                          >
-                            {opt}
-                          </Button>
+                        {Array.from({ length: Math.ceil(message.options.length / 2) }).map((_, rowIdx) => (
+                          <div className="flex mb-2" key={rowIdx}>
+                            <Button
+                              variant="outline"
+                              onClick={() => message.options && handleUserChoice(message.options[rowIdx * 2])}
+                              className="text-sm bg-darker border-2 border-darkest text-white w-1/2 mr-2 hover:bg-darkest focus:ring-[#5999ab] focus:bg-darkest"
+                            >
+                              {message.options && message.options[rowIdx * 2]}
+                            </Button>
+                            {message.options && message.options[rowIdx * 2 + 1] && (
+                              <Button
+                                variant="outline"
+                                onClick={() => message.options && handleUserChoice(message.options[rowIdx * 2 + 1])}
+                                className="text-sm bg-darker border-2 border-darkest text-white w-1/2 hover:bg-darkest focus:ring-[#5999ab] focus:bg-darkest"
+                              >
+                                {message.options[rowIdx * 2 + 1]}
+                              </Button>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}
