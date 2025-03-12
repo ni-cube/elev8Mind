@@ -28,7 +28,7 @@ interface PHQData {
   grade: string;
 }
 const AnalyticsPage = () => {
-  const [synopsis, setSynopsis] = useState('Loading synopsis...');
+  const [synopsis, setSynopsis] = useState('Loading summary...');
   const [userSynopsis, setUserSynopsis] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
 
@@ -403,7 +403,7 @@ const stackedChartData = {
               </div>
 
               <div className="w-2/3">
-                <h2 className="text-lg font-bold text-darkest mb-3">Synopsis</h2>
+                <h2 className="text-lg font-bold text-darkest mb-3">Summary</h2>
                 <p className="text-darkest">
                   {synopsis}
                 </p>
