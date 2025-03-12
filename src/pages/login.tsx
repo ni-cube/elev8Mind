@@ -177,7 +177,7 @@ const Login: React.FC = () => {
         </form>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mt-8 md:mt-16 md:grid-cols-4">
+      <div className="grid grid-cols-3 z-20 gap-4 mt-8 md:mt-16 md:grid-cols-4">
         {[
           { text: "Mobile Friendly", color: "bg-[#ff6b6b]" },
           { text: "Available 24/7", color: "bg-[#ffa502]" },
