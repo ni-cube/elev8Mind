@@ -22,7 +22,7 @@ export async function readChatResponse(reader: ReadableStreamDefaultReader<Uint8
     chatText = chatText.replace(/\\/g, "");
     //chatText = chatText.replace(/e:{*/g, "");
     //chatText = chatText.replace(/d:{*/g, "");
-    //chatText = chatText.replace(/.nn/g, ". ");
+    chatText = chatText.replaceAll(".nn", ". ");
     return chatText;
   }
 

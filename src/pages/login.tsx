@@ -15,7 +15,7 @@ const Login: React.FC = () => {
   const [grade, setGrade] = useState<string>(""); // State for grade dropdown
   const { getAllEmotions } = useEmotion();
   const [password, setPassword] = useState<string>(""); // For password
-  const [selectedEmotions, setSelectedEmotions] = useState<string[]>(["anger"]); // State for multiple emoji selections
+  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]); // State for multiple emoji selections
   
   const router = useRouter(); // To navigate to another page after login
 
@@ -39,13 +39,17 @@ const Login: React.FC = () => {
     } else if (username === "Nirajeet" && !password) {
       setErrorMessage("Please enter your password.");
     } else {
-      setErrorMessage("");
-
-      if(username === "Nirajeet" && password === "password") {
-        router.push('/admin');
+      if(selectedEmotions.length === 0) {
+        setErrorMessage("Please select at least one emotion.");
       } else {
-        // Redirect to the dashboard page
-        router.push('/dashboard'); // Navigate to the dashboard route
+        setErrorMessage("");
+
+        if(username === "Nirajeet" && password === "password") {
+          router.push('/admin');
+        } else {
+          // Redirect to the dashboard page
+          router.push('/dashboard'); // Navigate to the dashboard route
+        }
       }
     }
   };
@@ -168,8 +172,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             className="w-full py-3 bg-[#5999ab] text-white font-semibold rounded-lg hover:bg-[#407786] focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
-          >
-            Log In
+          >Log In
           </button>
         </form>
       </div>

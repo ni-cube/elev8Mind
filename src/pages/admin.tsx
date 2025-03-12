@@ -192,7 +192,7 @@ const AnalyticsPage = () => {
 
 
   const driftData = {
-    labels: ['1','2','3,','4','5','6','7'],
+    labels: ['1','2','3','4','5','6','7'],
     datasets: studentsWithMultipleSessions
   };
 
@@ -259,8 +259,8 @@ const AnalyticsPage = () => {
         label: 'Boys',
         data: generatePHQ9StackedBarChartData()['9'].map((entry, index) => entry.boys + generatePHQ9StackedBarChartData()['10'][index].boys 
           + generatePHQ9StackedBarChartData()['11'][index].boys + generatePHQ9StackedBarChartData()['12'][index].boys),
-        backgroundColor: '#rgba(8, 54, 67, 0.7)',
-        borderColor: '#rgba(8, 54, 67, 1)',
+        backgroundColor: 'rgba(8, 54, 67, 1)',
+        borderColor: '#2c5f66',
         borderWidth: 1
       },
       {
@@ -433,160 +433,229 @@ const stackedChartData = {
             </div>
 
             <div className="flex flex-wrap justify-between gap-4 rounded-lg p-5 shadow-md mb-5">
-              <div className="flex-1 bg-white min-w-[45%]">
+              <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg font-bold bg-lightest text-darkest mb-3">Emotional Comparison</h2>
-                <Bar
-                  data={phq9BarChartForSchool}
-                  options={{
-                    indexAxis: 'x',
-                    responsive: true,
-                    scales: {
-                      x: {
-                        min: 0,
-                        max: 11,
-                        ticks: {
-                          color: "#000", // Darker tick labels
-                          font: {
-                            size: 12,
+                <div className="h-full sm:h-[300px]">
+                  <Bar
+                    data={phq9BarChartForSchool}
+                    options={{
+                      indexAxis: 'x',
+                      responsive: true,
+                      scales: {
+                        x: {
+                          min: 0,
+                          max: 11,
+                          ticks: {
+                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
                           },
                         },
-                      },
-                      y: {
-                        title: {
-                          display: true,
-                          text: 'PHQ9-BDI Scores',
-                        },
-                        min: 0,
-                        ticks: {
-                          color: "#000", // Darker tick labels
-                          font: {
-                            size: 12,
+                        y: {
+                          title: {
+                            display: true,
+                            text: 'PHQ9-BDI Scores',
+                            color: "rgba(8, 54, 67, 1)",
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            },
+                          },
+                          min: 0,
+                          ticks: {
+                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            font: {
+                              size: 12,
+                              weight: 'bold',
+                            },
                           },
                         },
+                        
                       },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                 </div>
               </div>
 
 
               {/* Line Chart */}
-              <div className="flex-1 bg-white min-w-[45%]">
+              <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg bg-lightest font-bold text-darkest mb-3">Linguistic Drift</h2>
-                <Line data={driftData} options={{ 
-                  responsive: true,
-                  plugins: {
-                      title: {
-                          display: true,
-                          text: 'PHQ-9 Scores Over Time'
-                      },
-                      tooltip: {
-                          mode: 'index',
-                          intersect: false
-                      }
-                  },
-                  scales: {
-                      x: {
-                          title: {
-                              display: true,
-                              text: 'Number of Sessions' // Text for the x-axis
-                          }
-                      },
-                      y: {
-                          title: {
-                              display: true,
-                              text: 'PHQ9-BDI Scores' // Text for the y-axis
-                          },
-                          min: 0, 
-                          max: 40 // Adjust according to expected PHQ-9 score range
-                      }
-                  }
-                 }} />
+                <div className="h-[300px] sm:h-[400px]">
+                  <Line data={driftData} options={{ 
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'PHQ-9 Scores Over Time',
+                            color: "rgba(8, 54, 67, 1)",
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Number of Sessions',
+                                color: "rgba(8, 54, 67, 1)",
+                                font: {
+                                  size: 14,
+                                  weight: 'bold',
+                                }
+                            },
+                            ticks: {
+                              color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                              font: {
+                                size: 14,
+                                weight: 'bold',
+                              }
+                            },
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'PHQ9-BDI Scores',
+                                color: "rgba(8, 54, 67, 1)",
+                                font: {
+                                  size: 14,
+                                  weight: 'bold',
+                                }
+                            },
+                            min: 0, 
+                            max: 40,
+                            ticks: {
+                              color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                              font: {
+                                size: 14,
+                                weight: 'bold',
+                              }
+                            },
+                        }
+                    }
+                  }} />
+                 </div>
               </div>
             </div>
 
 
             <div className="flex flex-wrap justify-between gap-4 rounded-lg p-5 shadow-md mb-5">
               {/* Bar Chart */}
-              <div className="flex-1 bg-white min-w-[45%]">
+              <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg bg-lightest font-bold text-darkest mb-3">PHQ9-BDI Distribution By Gender</h2>
-                <Bar
-                  data={phq9BarChartByGender}
-                  options={{
-                    indexAxis: 'x',
-                    responsive: true,
-                    scales: {
-                      x: {
-                        title: {
-                          display: true,
-                          text: 'PHQ-9 Bands',
+                <div className="h-[300px] sm:h-[400px]">
+                  <Bar
+                    data={phq9BarChartByGender}
+                    options={{
+                      indexAxis: 'x',
+                      responsive: true,
+                      scales: {
+                        x: {
+                          title: {
+                            display: true,
+                            text: 'PHQ-9 Bands',
+                            color: "rgba(8, 54, 67, 1)",
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
+                          },
+                          min: 0,
+                          max: 11,
+                          ticks: {
+                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
+                          },
                         },
-                        min: 0,
-                        max: 11,
-                        ticks: {
-                          color: "#000", // Darker tick labels
-                          font: {
-                            size: 12,
+                        y: {
+                          title: {
+                            display: true,
+                            text: 'Average Score',
+                            color: "rgba(8, 54, 67, 1)",
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
+                          },
+                          min: 0,
+                          ticks: {
+                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
                           },
                         },
                       },
-                      y: {
-                        title: {
-                          display: true,
-                          text: 'Average Score',
-                        },
-                        min: 0,
-                        ticks: {
-                          color: "#000", // Darker tick labels
-                          font: {
-                            size: 12,
-                          },
-                        },
-                      },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </div>  
               </div>
 
               {/* Bar Chart */}
-              <div className="flex-1 bg-white min-w-[45%]">
+              <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg font-bold bg-lightest text-darkest mb-3">PHQ9-BDI Distribution By Grades</h2>
-                <Bar
-                  data={phq9BarChartByGrade}
-                  options={{
-                    indexAxis: 'x',
-                    responsive: true,
-                    scales: {
-                      x: {
-                        title: {
-                          display: true,
-                          text: 'PHQ9-BDI Bands',
+                <div className="h-[300px] sm:h-[400px]">
+                  <Bar
+                    data={phq9BarChartByGrade}
+                    options={{
+                      indexAxis: 'x',
+                      responsive: true,
+                      scales: {
+                        x: {
+                          title: {
+                            display: true,
+                            text: 'PHQ9-BDI Bands',
+                            color: "rgba(8, 54, 67, 1)",
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
+                          },
+                          min: 0,
+                          max: 11,
+                          ticks: {
+                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
+                          },
                         },
-                        min: 0,
-                        max: 11,
-                        ticks: {
-                          color: "#000", // Darker tick labels
-                          font: {
-                            size: 12,
+                        y: {
+                          title: {
+                            display: true,
+                            text: 'Average Scores',
+                            color: "rgba(8, 54, 67, 1)",
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
+                          },
+                          min: 0,
+                          ticks: {
+                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            font: {
+                              size: 14,
+                              weight: 'bold',
+                            }
                           },
                         },
                       },
-                      y: {
-                        title: {
-                          display: true,
-                          text: 'Average Scores',
-                        },
-                        min: 0,
-                        ticks: {
-                          color: "#000", // Darker tick labels
-                          font: {
-                            size: 12,
-                          },
-                        },
-                      },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </div>  
               </div>
             </div>
 
@@ -608,11 +677,17 @@ const stackedChartData = {
                         title: {
                           display: true,
                           text: "PHQ9-BDI Categories",
+                          color: "rgba(8, 54, 67, 1)",
+                          font: {
+                            size: 14,
+                            weight: 'bold',
+                          }
                         },
                         ticks: {
-                          color: "#000", // Darker tick labels
+                          color: "rgba(8, 54, 67, 1)", // Darker tick labels
                           font: {
-                            size: 12,
+                            size: 14,
+                            weight: 'bold',
                           },
                         },
                       },
@@ -621,11 +696,17 @@ const stackedChartData = {
                         title: {
                           display: true,
                           text: "Average Score",
+                          color: "rgba(8, 54, 67, 1)",
+                          font: {
+                            size: 14,
+                            weight: 'bold',
+                          },
                         },
                         ticks: {
-                          color: "#000", // Darker tick labels
+                          color: "rgba(8, 54, 67, 1)", // Darker tick labels
                           font: {
-                            size: 12,
+                            size: 14,
+                            weight: 'bold',
                           },
                         },
                       },
