@@ -156,7 +156,8 @@ export default function ChatPrompt({ messages, setMessages, setGameState }: { me
           symptomSelected.symptomCovered = "Suicidal_H";
         } else if(chatText.toLowerCase().indexOf("help is available")!=-1 ||
           chatText.toLowerCase().indexOf("crisis helpline")!=-1 ||
-          chatText.toLowerCase().indexOf("resources available to help")!=-1) {  
+          chatText.toLowerCase().indexOf("resources available to help")!=-1 ||
+          chatText.toLowerCase().indexOf("seek help and support")!=-1) {  
           chatText += ("\n\n" + helpMessage);
           symptomSelected.symptomCovered = "Suicidal_H";      
         } else if(chatText.indexOf("Thank you. I'm here to help whenever you need me.")!=-1) {

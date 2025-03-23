@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
+import { Bell } from 'lucide-react';
 import { CategoryScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, LinearScale } from 'chart.js';
 import Chart from 'chart.js/auto';
 import Layout from '@/layout';
@@ -31,6 +32,7 @@ const AnalyticsPage = () => {
   const [synopsis, setSynopsis] = useState('Loading summary...');
   const [userSynopsis, setUserSynopsis] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
+  const [activeTab, setActiveTab] = useState('summary'); 
 
   const [phqData] = useState<PHQData[]>(() => {
     if (!userSessions || userSessions.length === 0) {
@@ -74,7 +76,8 @@ const AnalyticsPage = () => {
   
       return acc;
     }, {} as Record<string, PHQData>);
-  
+
+
     // Calculate the averages for phqScore, bdiScore, and phq9Categories
     return Object.values(userMap).map(user => ({
       name: user.name,
@@ -92,6 +95,8 @@ const AnalyticsPage = () => {
     }));
   });
   
+  const studentsToNotify = phqData.slice(0, 5); 
+
   const studentData = (name: string): PHQData[] => {
     const data: PHQData[] = userSessions
       .filter((session) => session.user.split(':')[1] === name)
@@ -203,8 +208,8 @@ const AnalyticsPage = () => {
       {
         label: 'Emotional Categrories',
         data: phq9BarChartDataForSchool['1'],
-        backgroundColor: 'rgba(8, 54, 67, 1)',
-        borderColor: '#rgba(8, 54, 67, 0.7)',
+        backgroundColor: 'rgba(1, 87, 155, 1)',
+        borderColor: '#rgba(1, 87, 155, 0.7)',
         borderWidth: 1
       }
     ]
@@ -259,7 +264,7 @@ const AnalyticsPage = () => {
         label: 'Boys',
         data: generatePHQ9StackedBarChartData()['9'].map((entry, index) => entry.boys + generatePHQ9StackedBarChartData()['10'][index].boys 
           + generatePHQ9StackedBarChartData()['11'][index].boys + generatePHQ9StackedBarChartData()['12'][index].boys),
-        backgroundColor: 'rgba(8, 54, 67, 1)',
+        backgroundColor: 'rgba(1, 87, 155, 1)',
         borderColor: '#2c5f66',
         borderWidth: 1
       },
@@ -280,7 +285,7 @@ const AnalyticsPage = () => {
       {
         label: '9',
         data: generatePHQ9StackedBarChartData()['9'].map((entry) => entry.total),
-        backgroundColor: 'rgba(8, 54, 67, 1)',
+        backgroundColor: 'rgba(1, 87, 155, 1)',
         borderColor: '#2c5f66',
         borderWidth: 1
       },
@@ -356,8 +361,8 @@ rawData.datasets.forEach((grade) => {
   datasets.push({
     label: `${grade.label} - Boys`,
     data: grade.data.map((entry) => entry.boys),
-    backgroundColor: 'rgba(8, 54, 67, 1)', // Blue for Boys
-    borderColor: "rgba(8, 54, 67, 0.7)",
+    backgroundColor: 'rgba(1, 87, 155, 1)', // Blue for Boys
+    borderColor: "rgba(1, 87, 155, 0.7)",
     borderWidth: 1,
     stack: grade.label, // Ensures boys & girls are stacked within the same grade
   });
@@ -389,53 +394,98 @@ const stackedChartData = {
                 <div className="flex flex-col gap-4">
                   <div>
                     <h3 className="text-md text-darkest">Total Users</h3>
-                    <p className="text-xl font-bold text-darkest">{totalUsers}</p>
+                    <p className="text-xl font-bold text-text">{totalUsers}</p>
                   </div>
                   <div>
                     <h3 className="text-md text-darkest">Average PHQ-9 Score</h3>
-                    <p className="text-xl font-bold text-darkest">{averagePHQScore}</p>
+                    <p className="text-xl font-bold text-text">{averagePHQScore}</p>
                   </div>
                   <div>
                     <h3 className="text-md text-darkest">Average BDI Score</h3>
-                    <p className="text-xl font-bold text-darkest">{averageBDIScore}</p>
+                    <p className="text-xl font-bold text-text">{averageBDIScore}</p>
                   </div>
                 </div>
               </div>
 
+
               <div className="w-2/3">
-                <h2 className="text-lg font-bold text-darkest mb-3">Summary</h2>
-                <p className="text-darkest">
-                  {synopsis}
-                </p>
-                <div className="mt-4">
-                  <select
-                    id="userDropdown"
-                    className="px-4 py-2 border rounded-lg bg-lighter text-darkest focus:ring-2 focus:ring-[#5999ab]"
-                    value={selectedUser}
-                    onChange={handleUserChange}
+                <div className="flex border-b mb-4">
+                  <button 
+                    className={`text-lg font-bold ${activeTab === 'summary' ? 'text-darkest' : 'text-gray-600'}`}
+                    onClick={() => setActiveTab('summary')}
                   >
-                    <option value="" disabled>
-                      Options...
-                    </option>
-                    {Array.from(
-                      new Map(phqData.map((user) => [user.name, user])).values()
-                    ).map((user) => (
-                      <option key={user.name} value={user.name}>
-                        {user.name}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-darkest">
-                    {userSynopsis}
-                  </p>
+                    Summary
+                  </button>
+                  <button 
+                    className={`px-4 py-2 flex items-center gap-2 text-lg font-bold ${activeTab === 'notifications' ? 'text-darkest' : 'text-gray-600'}`}
+                    onClick={() => setActiveTab('notifications')}
+                  >
+                    <Bell size={20} className="text-primary" color="red"/>
+                    Notifications
+                  </button>
                 </div>
+                {activeTab === 'summary' && (
+                  <div>
+                    <p className="text-text">
+                      {synopsis}
+                    </p>
+                    <div className="mt-4">
+                      <select
+                        id="userDropdown"
+                        className="px-4 py-2 border rounded-lg bg-lighter text-text focus:ring-2 focus:ring-[#5999ab]"
+                        value={selectedUser}
+                        onChange={handleUserChange}
+                      >
+                        <option value="" disabled>
+                          Options...
+                        </option>
+                        {Array.from(
+                          new Map(phqData.map((user) => [user.name, user])).values()
+                        ).map((user) => (
+                          <option key={user.name} value={user.name}>
+                            {user.name}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-darkest">
+                        {userSynopsis}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {activeTab === 'notifications' && (
+                  <div>
+                    <h3 className="text-md font-bold text-red-700 mb-2">🚨 Critical Cases for Review</h3>
+                    <div className="mt-4">
+                      <select
+                        id="userDropdown"
+                        className="px-4 py-2 border rounded-lg bg-lighter text-text focus:ring-2 focus:ring-[#5999ab]"
+                        value={studentsToNotify.length > 0 ? studentsToNotify[0].name : ''}
+                        onChange={handleUserChange}
+                      >
+                        <option value="" disabled>
+                          Options...
+                        </option>
+                        {studentsToNotify.map((user) => (
+                          <option key={user.name} value={user.name}>
+                            {user.name}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-darkest">
+                        {userSynopsis}
+                      </p>
+                    </div>
+
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="flex flex-wrap justify-between gap-4 rounded-lg p-5 shadow-md mb-5">
               <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg font-bold bg-lightest text-darkest mb-3">Emotional Comparison</h2>
-                <div className="h-full sm:h-[300px]">
+                <div className="h-full">
                   <Bar
                     data={phq9BarChartForSchool}
                     options={{
@@ -446,7 +496,7 @@ const stackedChartData = {
                           min: 0,
                           max: 11,
                           ticks: {
-                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            color: "rgba(1, 87, 155, 1)", // Darker tick labels
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -457,7 +507,7 @@ const stackedChartData = {
                           title: {
                             display: true,
                             text: 'PHQ9-BDI Scores',
-                            color: "rgba(8, 54, 67, 1)",
+                            color: "rgba(1, 87, 155, 1)",
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -465,7 +515,7 @@ const stackedChartData = {
                           },
                           min: 0,
                           ticks: {
-                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            color: "rgba(1, 87, 155, 1)", // Darker tick labels
                             font: {
                               size: 12,
                               weight: 'bold',
@@ -483,14 +533,14 @@ const stackedChartData = {
               {/* Line Chart */}
               <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg bg-lightest font-bold text-darkest mb-3">Linguistic Drift</h2>
-                <div className="h-[300px] sm:h-[400px]">
+                <div className="h-full">
                   <Line data={driftData} options={{ 
                     responsive: true,
                     plugins: {
                         title: {
                             display: true,
                             text: 'PHQ-9 Scores Over Time',
-                            color: "rgba(8, 54, 67, 1)",
+                            color: "rgba(1, 87, 155, 1)",
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -506,14 +556,14 @@ const stackedChartData = {
                             title: {
                                 display: true,
                                 text: 'Number of Sessions',
-                                color: "rgba(8, 54, 67, 1)",
+                                color: "rgba(1, 87, 155, 1)",
                                 font: {
                                   size: 14,
                                   weight: 'bold',
                                 }
                             },
                             ticks: {
-                              color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                              color: "rgba(1, 87, 155, 1)", // Darker tick labels
                               font: {
                                 size: 14,
                                 weight: 'bold',
@@ -524,7 +574,7 @@ const stackedChartData = {
                             title: {
                                 display: true,
                                 text: 'PHQ9-BDI Scores',
-                                color: "rgba(8, 54, 67, 1)",
+                                color: "rgba(1, 87, 155, 1)",
                                 font: {
                                   size: 14,
                                   weight: 'bold',
@@ -533,7 +583,7 @@ const stackedChartData = {
                             min: 0, 
                             max: 40,
                             ticks: {
-                              color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                              color: "rgba(1, 87, 155, 1)", // Darker tick labels
                               font: {
                                 size: 14,
                                 weight: 'bold',
@@ -551,7 +601,7 @@ const stackedChartData = {
               {/* Bar Chart */}
               <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg bg-lightest font-bold text-darkest mb-3">PHQ9-BDI Distribution By Gender</h2>
-                <div className="h-[300px] sm:h-[400px]">
+                <div className="h-full">
                   <Bar
                     data={phq9BarChartByGender}
                     options={{
@@ -562,7 +612,7 @@ const stackedChartData = {
                           title: {
                             display: true,
                             text: 'PHQ-9 Bands',
-                            color: "rgba(8, 54, 67, 1)",
+                            color: "rgba(1, 87, 155, 1)",
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -571,7 +621,7 @@ const stackedChartData = {
                           min: 0,
                           max: 11,
                           ticks: {
-                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            color: "rgba(1, 87, 155, 1)", // Darker tick labels
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -582,7 +632,7 @@ const stackedChartData = {
                           title: {
                             display: true,
                             text: 'Average Score',
-                            color: "rgba(8, 54, 67, 1)",
+                            color: "rgba(1, 87, 155, 1)",
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -590,7 +640,7 @@ const stackedChartData = {
                           },
                           min: 0,
                           ticks: {
-                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            color: "rgba(1, 87, 155, 1)", // Darker tick labels
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -606,7 +656,7 @@ const stackedChartData = {
               {/* Bar Chart */}
               <div className="w-full sm:w-[45%] bg-white">
                 <h2 className="text-lg font-bold bg-lightest text-darkest mb-3">PHQ9-BDI Distribution By Grades</h2>
-                <div className="h-[300px] sm:h-[400px]">
+                <div className="h-full">
                   <Bar
                     data={phq9BarChartByGrade}
                     options={{
@@ -617,7 +667,7 @@ const stackedChartData = {
                           title: {
                             display: true,
                             text: 'PHQ9-BDI Bands',
-                            color: "rgba(8, 54, 67, 1)",
+                            color: "rgba(1, 87, 155, 1)",
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -626,7 +676,7 @@ const stackedChartData = {
                           min: 0,
                           max: 11,
                           ticks: {
-                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            color: "rgba(1, 87, 155, 1)", // Darker tick labels
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -637,7 +687,7 @@ const stackedChartData = {
                           title: {
                             display: true,
                             text: 'Average Scores',
-                            color: "rgba(8, 54, 67, 1)",
+                            color: "rgba(1, 87, 155, 1)",
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -645,7 +695,7 @@ const stackedChartData = {
                           },
                           min: 0,
                           ticks: {
-                            color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                            color: "rgba(1, 87, 155, 1)", // Darker tick labels
                             font: {
                               size: 14,
                               weight: 'bold',
@@ -677,14 +727,14 @@ const stackedChartData = {
                         title: {
                           display: true,
                           text: "PHQ9-BDI Categories",
-                          color: "rgba(8, 54, 67, 1)",
+                          color: "rgba(1, 87, 155, 1)",
                           font: {
                             size: 14,
                             weight: 'bold',
                           }
                         },
                         ticks: {
-                          color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                          color: "rgba(1, 87, 155, 1)", // Darker tick labels
                           font: {
                             size: 14,
                             weight: 'bold',
@@ -696,14 +746,14 @@ const stackedChartData = {
                         title: {
                           display: true,
                           text: "Average Score",
-                          color: "rgba(8, 54, 67, 1)",
+                          color: "rgba(1, 87, 155, 1)",
                           font: {
                             size: 14,
                             weight: 'bold',
                           },
                         },
                         ticks: {
-                          color: "rgba(8, 54, 67, 1)", // Darker tick labels
+                          color: "rgba(1, 87, 155, 1)", // Darker tick labels
                           font: {
                             size: 14,
                             weight: 'bold',

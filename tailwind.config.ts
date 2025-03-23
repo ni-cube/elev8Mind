@@ -13,7 +13,7 @@ export default {
         lighter: "#a7d7e4",
         lightest: "#e8f4f7",
         darker: "#5999ab",
-        darkest: "#082a32",
+        darkest: "#01579B",
         text: "#2c5561",
       },
       animation: {
