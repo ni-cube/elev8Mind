@@ -75,7 +75,7 @@ export default function Dashboard() {
                         <div
                             className={clsx(
                                 'max-w-[70%] p-3 rounded-lg shadow-lg border-2 border-darkest',
-                                message.sender === 'user' ? 'bg-darkest text-white' : 'bg-lighter text-darkest'
+                                message.sender === 'user' ? 'bg-darkest text-white' : 'bg-lighter text-black'
                             )}
                         >
                             {message.text.split('/n').map((line, idx) => (

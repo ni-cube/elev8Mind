@@ -15,7 +15,7 @@ const Login: React.FC = () => {
   const [grade, setGrade] = useState<string>(""); // State for grade dropdown
   const { getAllEmotions } = useEmotion();
   const [password, setPassword] = useState<string>(""); // For password
-  const [selectedEmotions, setSelectedEmotions] = useState<string[]>(["anger"]); // State for multiple emoji selections
+  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]); // State for multiple emoji selections
   
   const router = useRouter(); // To navigate to another page after login
 
@@ -36,16 +36,20 @@ const Login: React.FC = () => {
     // Check if the username is empty for anonymous users or required for authenticated users
     if (!username) {
       setErrorMessage("Please fill out your user name.");
-    } else if (username === "Nirajeet" && !password) {
+    } else if (username === "admin" && !password) {
       setErrorMessage("Please enter your password.");
     } else {
-      setErrorMessage("");
-
-      if(username === "Nirajeet" && password === "password") {
-        router.push('/admin');
+      if(username != "admin" && selectedEmotions.length === 0) {
+        setErrorMessage("Please select at least one emotion.");
       } else {
-        // Redirect to the dashboard page
-        router.push('/dashboard'); // Navigate to the dashboard route
+        setErrorMessage("");
+
+        if(username === "admin" && password === "password") {
+          router.push('/admin');
+        } else {
+          // Redirect to the dashboard page
+          router.push('/dashboard'); // Navigate to the dashboard route
+        }
       }
     }
   };
@@ -92,8 +96,8 @@ const Login: React.FC = () => {
           </div>
         </div>
 
-        {/* Show password box if the username is Nirajeet */}
-        {username === "Nirajeet" && (
+        {/* Show password box if the username is admin */}
+        {username === "admin" && (
           <div className="flex space-x-4 mb-4">
             <div className="flex-1">
               <label htmlFor="password" className="block text-[#2c5561] text-md mb-2">
@@ -110,7 +114,7 @@ const Login: React.FC = () => {
             </div>
           </div>
         )}
-        {username != "Nirajeet" && (
+        {username != "admin" && (
           <>
             <div className="mb-4">
               <label htmlFor="gender" className="block text-[#2c5561] text-md mb-2">
@@ -145,40 +149,39 @@ const Login: React.FC = () => {
                 <option value="12">12</option>
               </select>
             </div>
+            <div className="mt-6 flex gap-3 flex-wrap justify-center mb-4">
+              {getAllEmotions().map((emotion, emoji) => (
+                <button
+                  key={emoji}
+                  onClick={(e) => handleClick(e, emotion.emotion as "joy" | "sadness" | "anxiety" | "anger" | "sleepy" | "upset")}
+                  className={`flex flex-col items-center p-2 border-1 rounded-lg cursor-pointer
+                        ${selectedEmotions.includes(emotion.emotion) ? 'bg-[#4db8ff] border-2 border-[#1d8fbc]' : 'bg-lighter'}
+                        hover:bg-[#ffde59] focus:ring-2 focus:ring-[#5999ab]`}
+                >
+                  <span className="text-4xl">{emotion.emoji.emoji}</span>
+                  <span className="text-sm text-text">{emotion.emotion}</span>
+                </button>
+              ))}
+            </div>
           </>
         )}
-        {/* Anonymous checkbox below the username and password */}
-        <div className="mt-6 flex gap-3 flex-wrap justify-center mb-4">
-          {getAllEmotions().map((emotion, emoji) => (
-            <button
-              key={emoji}
-              onClick={(e) => handleClick(e, emotion.emotion as "joy" | "sadness" | "anxiety" | "anger" | "sleepy" | "upset")}
-              className={`flex flex-col items-center p-2 border-1 rounded-lg cursor-pointer
-                    ${selectedEmotions.includes(emotion.emotion) ? 'bg-[#4db8ff] border-2 border-[#1d8fbc]' : 'bg-lighter'}
-                    hover:bg-[#ffde59] focus:ring-2 focus:ring-[#5999ab]`}
-            >
-              <span className="text-4xl">{emotion.emoji.emoji}</span>
-              <span className="text-sm text-text">{emotion.emotion}</span>
-            </button>
-          ))}
-        </div>
+
         
           {errorMessage && <p className="text-red-500 text-sm mb-5">{errorMessage}</p>}
 
           <button
             type="submit"
             className="w-full py-3 bg-[#5999ab] text-white font-semibold rounded-lg hover:bg-[#407786] focus:outline-none focus:ring-2 focus:ring-[#5999ab]"
-          >
-            Log In
+          >Log In
           </button>
         </form>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mt-8 md:mt-16 md:grid-cols-4">
+      <div className="grid grid-cols-3 z-20 gap-4 mt-8 md:mt-16 md:grid-cols-4">
         {[
           { text: "Mobile Friendly", color: "bg-[#ff6b6b]" },
           { text: "Available 24/7", color: "bg-[#ffa502]" },
-          { text: "Cheaper", color: "bg-[#2ed573]" },
+          { text: "Cost Effective", color: "bg-[#2ed573]" },
           { text: "More Outreach", color: "bg-[#1e90ff]" }
         ].map((feature, index) => (
           <div key={index} className={`${feature.color} text-md md:text-lg text-white px-6 py-4 rounded-full shadow-md flex items-center justify-center w-24 h-24 text-center font-bold md:w-32 md:h-32`}>

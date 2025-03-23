@@ -69,7 +69,7 @@ export default function ChatHeader(gameState: GameProps) {
                     alt="Elev8Mind Logo" 
                     width={200} 
                     height={50} 
-                    className="w-auto h-12 md:h-16 lg:h-20 max-w-full object-contain"
+                    className="w-auto h-10 md:h-12 max-w-full object-contain"
                 />
             </div>
             {gameState.level!=0 && (

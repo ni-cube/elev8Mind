@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
             .replaceAll("{{keywords}}", keywords.join(", "))
             .replaceAll("{{answer}}", messages.slice(-1)[0].text)
             .replaceAll("{{old_keywords}}", oldKeywords.join(", "))
-            .replaceAll("{{severity}}", severity)};
+            .replaceAll("{{severity}}", severity.toString())};
     combinedMessages = [systemMsg, ...formattedMessages.slice(-2)];
   }
 
